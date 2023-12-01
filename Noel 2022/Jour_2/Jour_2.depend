@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1670247177 source:d:\travail\code\noel\jour_2\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
