@@ -1,0 +1,13 @@
+# depslib dependency file v1.0
+1701424676 source:d:\travail\code\noel 2023\jour_1\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+
+1701539287 source:/home/stephane/Arduino/Advent_of_Code/Noel 2023/Jour_2/main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+
