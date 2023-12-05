@@ -23,3 +23,10 @@
 	<string.h>
 	<ctype.h>
 
+1701818690 source:/home/stephane/Arduino/Advent_of_Code/Noel 2023/Jour_5/main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	<limits.h>
+

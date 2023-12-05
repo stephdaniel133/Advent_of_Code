@@ -2,127 +2,476 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <limits.h>
 
-//#define NBR_WINNING 5
-//#define NBR_LIST    8
-#define NBR_WINNING 10
-#define NBR_LIST    25
+//#define SEED_NBR    4
+#define SEED_NBR    20
+
+typedef struct
+{
+    long long dst;
+    long long src;
+    long long len;
+    int nbrDeTable;
+} MAP;
+
+long long moulinette(long long seed, MAP *seedToSoil, MAP *soilToFertilizer, MAP *fertilizerToWater, MAP *waterToLight, MAP *lightToTemperature, MAP *temperatureToHumidity, MAP *humidityToLocation);
+
 
 int main(int argc, char *argv[])
 {
-    char buf[200];
-    int i = 0;
+    char buf[300];
+    char tempstr[100];
+    long long i = 0;
     int j = 0;
-    int card = 0;
-    int listWin[10];
-    int listTest[25];
-    int listNbrMatch[300];
-    int listInstance[300];
-    int factoriel = 0;
-    int sommegame = 0;
-    char tmpstr[200];
+    long long seed[SEED_NBR];
+    long long seedresult[SEED_NBR];
+    MAP seedToSoil[50];
+    MAP soilToFertilizer[50];
+    MAP fertilizerToWater[50];
+    MAP waterToLight[50];
+    MAP lightToTemperature[50];
+    MAP temperatureToHumidity[50];
+    MAP humidityToLocation[50];
+    long long result1 = 0;
+    long long result2 = 0;
+
 
     FILE *fic = NULL;
 
     fic = fopen("data.txt", "r");
 
-    memset(listWin, 0, sizeof(listWin));
-    memset(listTest, 0, sizeof(listTest));
-    memset(listNbrMatch, 0, sizeof(listNbrMatch));
+    memset(seed, 0, sizeof(seed));
+    memset(seedToSoil, 0, sizeof(seedToSoil));
+    memset(soilToFertilizer, 0, sizeof(soilToFertilizer));
+    memset(fertilizerToWater, 0, sizeof(fertilizerToWater));
+    memset(waterToLight, 0, sizeof(waterToLight));
+    memset(lightToTemperature, 0, sizeof(lightToTemperature));
+    memset(temperatureToHumidity, 0, sizeof(temperatureToHumidity));
+    memset(humidityToLocation, 0, sizeof(humidityToLocation));
 
-    for(i=0 ; i<(sizeof(listInstance)/sizeof(int)) ; i++)
-        listInstance[i] = 1;
+
 
     if(fic != NULL)
     {
         printf("fichier ouvert\n");
 
-        while(!feof(fic))
+        //while(!feof(fic))
         {
-            fgets(buf, 200, fic);
+            fgets(buf, 300, fic);
             //printf("%s, longueur = %d\n", buf, (int)strlen(buf));
 
-            //On obtient le numéro du game
-            sscanf(buf, "%s %d", tmpstr, &card);
-            //printf("%s, string = %s, game = %d", buf, tempstr, game);
-            printf("Game = %d : ", card);
+            //On obtient les seed
+            //sscanf(buf, "%s %lld%lld%lld%lld", tempstr, &seed[0], &seed[1], &seed[2], &seed[3]);
 
-            /*
-            sscanf(&buf[8], "%d%d%d%d%d", &listWin[0], &listWin[1], &listWin[2], &listWin[3], &listWin[4]);
-            sscanf(&buf[25], "%d%d%d%d%d%d%d%d", &listTest[0], &listTest[1], &listTest[2], &listTest[3],
-                                                 &listTest[4], &listTest[5], &listTest[6], &listTest[7]);
-            */
-            sscanf(&buf[10], "%d%d%d%d%d%d%d%d%d%d", &listWin[0], &listWin[1], &listWin[2], &listWin[3], &listWin[4], &listWin[5],
-                                                     &listWin[6], &listWin[7], &listWin[8], &listWin[9]);
-            sscanf(&buf[42], "%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d", &listTest[0], &listTest[1], &listTest[2], &listTest[3], &listTest[4],
-                                                                                   &listTest[5], &listTest[6], &listTest[7], &listTest[8], &listTest[9],
-                                                                                   &listTest[10], &listTest[11], &listTest[12], &listTest[13], &listTest[14],
-                                                                                   &listTest[15], &listTest[16], &listTest[17], &listTest[18], &listTest[19],
-                                                                                   &listTest[20], &listTest[21], &listTest[22], &listTest[23], &listTest[24]);
-
-            printf("numero gagnants :");
+            sscanf(buf, "%s %lld%lld%lld%lld%lld%lld%lld%lld%lld%lld%lld%lld%lld%lld%lld%lld%lld%lld%lld%lld", tempstr,
+                        &seed[0], &seed[1], &seed[2], &seed[3], &seed[4], &seed[5], &seed[6], &seed[7], &seed[8], &seed[9],
+                        &seed[10], &seed[11], &seed[12], &seed[13], &seed[14], &seed[15], &seed[16], &seed[17], &seed[18], &seed[19]);
 
 
-
-            for(i=0 ; i<NBR_WINNING ; i++)
+            for(j=0 ; j<SEED_NBR ; j++)
             {
-                for(j=0 ; j<NBR_LIST ; j++)
-                {
-                    if(listWin[i] == listTest[j])
-                    {
-                        printf(" %d ", listWin[i]);
-
-                        listNbrMatch[card-1] += 1;   //Utile pour la partie 2
-
-                        if(factoriel == 0)
-                        {
-                            factoriel = 1;
-                        }
-                        else
-                        {
-                            factoriel *= 2;
-                        }
-                    }
-                }
+                seedresult[j] = seed[j];
             }
 
-            printf(", factorielle = %d, nombre de match = %d\n", factoriel, listNbrMatch[card-1]);
-            sommegame += factoriel;
-            factoriel = 0;
+            fgets(buf, 300, fic); // on saute la ligne
+            fgets(buf, 300, fic); //on saute le seed-to-soil map
+
+            i = 0;
+            do
+            {
+                fgets(buf, 300, fic); // on saute la ligne
+                sscanf(buf, "%lld%lld%lld", &seedToSoil[i].dst, &seedToSoil[i].src, &seedToSoil[i].len);
+                i++;
+            }
+            while(strcmp(buf, "\n"));
+            seedToSoil[0].nbrDeTable = i-1;
+
+            fgets(buf, 300, fic); //on saute le soil-to-fertilizer map
+
+            i = 0;
+            do
+            {
+                fgets(buf, 300, fic); // on saute la ligne
+                sscanf(buf, "%lld%lld%lld", &soilToFertilizer[i].dst, &soilToFertilizer[i].src, &soilToFertilizer[i].len);
+                i++;
+            }
+            while(strcmp(buf, "\n"));
+            soilToFertilizer[0].nbrDeTable = i-1;
+
+            fgets(buf, 300, fic); //on saute le fertilizer-to-water map
+
+            i = 0;
+            do
+            {
+                fgets(buf, 300, fic); // on saute la ligne
+                sscanf(buf, "%lld%lld%lld", &fertilizerToWater[i].dst, &fertilizerToWater[i].src, &fertilizerToWater[i].len);
+                i++;
+            }
+            while(strcmp(buf, "\n"));
+            fertilizerToWater[0].nbrDeTable = i-1;
+
+            fgets(buf, 300, fic); //on saute le water-to-light map
+
+            i = 0;
+            do
+            {
+                fgets(buf, 300, fic); // on saute la ligne
+                sscanf(buf, "%lld%lld%lld", &waterToLight[i].dst, &waterToLight[i].src, &waterToLight[i].len);
+                i++;
+            }
+            while(strcmp(buf, "\n"));
+            waterToLight[0].nbrDeTable = i-1;
+
+            fgets(buf, 300, fic); //on saute le light-to-temperature map
+
+            i = 0;
+            do
+            {
+                fgets(buf, 300, fic); // on saute la ligne
+                sscanf(buf, "%lld%lld%lld", &lightToTemperature[i].dst, &lightToTemperature[i].src, &lightToTemperature[i].len);
+                i++;
+            }
+            while(strcmp(buf, "\n"));
+            lightToTemperature[0].nbrDeTable = i-1;
+
+            fgets(buf, 300, fic); //on saute le temperature-to-humidity map
+
+            i = 0;
+            do
+            {
+                fgets(buf, 300, fic); // on saute la ligne
+                sscanf(buf, "%lld%lld%lld", &temperatureToHumidity[i].dst, &temperatureToHumidity[i].src, &temperatureToHumidity[i].len);
+                i++;
+            }
+            while(strcmp(buf, "\n"));
+            temperatureToHumidity[0].nbrDeTable = i-1;
+
+            fgets(buf, 300, fic); //on saute le humidity-to-location map
+
+            i = 0;
+            while(!feof(fic))
+            {
+                fgets(buf, 300, fic); // on saute la ligne
+
+                sscanf(buf, "%lld%lld%lld\n\n", &humidityToLocation[i].dst, &humidityToLocation[i].src, &humidityToLocation[i].len);
+                i++;
+            }
+            humidityToLocation[0].nbrDeTable = i;
+
         }
+
+        //----------------Algo on passe les seed dans les tables-------------------------
+        for(j=0 ; j<SEED_NBR ; j++)
+        {
+            printf("Seed %lld", seed[j]);
+            for(i=0 ; i<seedToSoil[0].nbrDeTable ; i++)
+            {
+                if((seedToSoil[i].src <= seedresult[j]) && (seedresult[j] < seedToSoil[i].src + seedToSoil[i].len))
+                {
+                    seedresult[j] = seedresult[j] - seedToSoil[i].src + seedToSoil[i].dst;
+                    break;
+                }
+                else
+                    seedresult[j] = seedresult[j];
+            }
+
+            printf(", %lld", seedresult[j]);
+
+            for(i=0 ; i<soilToFertilizer[0].nbrDeTable ; i++)
+            {
+                if((soilToFertilizer[i].src <= seedresult[j]) && (seedresult[j] < soilToFertilizer[i].src + soilToFertilizer[i].len))
+                {
+                    seedresult[j] = seedresult[j] - soilToFertilizer[i].src + soilToFertilizer[i].dst;
+                    break;
+                }
+                else
+                    seedresult[j] = seedresult[j];
+            }
+
+            printf(", %lld", seedresult[j]);
+
+            for(i=0 ; i<fertilizerToWater[0].nbrDeTable ; i++)
+            {
+                if((fertilizerToWater[i].src <= seedresult[j]) && (seedresult[j] < fertilizerToWater[i].src + fertilizerToWater[i].len))
+                {
+                    seedresult[j] = seedresult[j] - fertilizerToWater[i].src + fertilizerToWater[i].dst;
+                    break;
+                }
+                else
+                    seedresult[j] = seedresult[j];
+            }
+
+            printf(", %lld", seedresult[j]);
+
+            for(i=0 ; i<waterToLight[0].nbrDeTable ; i++)
+            {
+                if((waterToLight[i].src <= seedresult[j]) && (seedresult[j] < waterToLight[i].src + waterToLight[i].len))
+                {
+                    seedresult[j] = seedresult[j] - waterToLight[i].src + waterToLight[i].dst;
+                    break;
+                }
+                else
+                    seedresult[j] = seedresult[j];
+            }
+
+            printf(", %lld", seedresult[j]);
+
+            for(i=0 ; i<lightToTemperature[0].nbrDeTable ; i++)
+            {
+                if((lightToTemperature[i].src <= seedresult[j]) && (seedresult[j] < lightToTemperature[i].src + lightToTemperature[i].len))
+                {
+                    seedresult[j] = seedresult[j] - lightToTemperature[i].src + lightToTemperature[i].dst;
+                    break;
+                }
+                else
+                    seedresult[j] = seedresult[j];
+            }
+
+            printf(", %lld", seedresult[j]);
+
+            for(i=0 ; i<temperatureToHumidity[0].nbrDeTable ; i++)
+            {
+                if((temperatureToHumidity[i].src <= seedresult[j]) && (seedresult[j] < temperatureToHumidity[i].src + temperatureToHumidity[i].len))
+                {
+                    seedresult[j] = seedresult[j] - temperatureToHumidity[i].src + temperatureToHumidity[i].dst;
+                    break;
+                }
+                else
+                    seedresult[j] = seedresult[j];
+            }
+
+            printf(", %lld", seedresult[j]);
+
+            for(i=0 ; i<humidityToLocation[0].nbrDeTable ; i++)
+            {
+                if((humidityToLocation[i].src <= seedresult[j]) && (seedresult[j] < humidityToLocation[i].src + humidityToLocation[i].len))
+                {
+                    seedresult[j] = seedresult[j] - humidityToLocation[i].src + humidityToLocation[i].dst;
+                    break;
+                }
+                else
+                    seedresult[j] = seedresult[j];
+            }
+
+
+            printf(", %lld\n", seedresult[j]);
+        }
+
+
+        printf("Impossible d'ouvrir le fichier data\n");
+
     }
     else
     {
         printf("Impossible d'ouvrir le fichier data\n");
     }
 
-    //On calcule la somme de toutes les games possibles
-    printf("somme des factorielles = %d\n", sommegame);
+    //On calcule le minimum
+    result1 = seedresult[0];
+    for(i=1 ; i<SEED_NBR ; i++)
+    {
+        if(seedresult[i] < result1)
+            result1 = seedresult[i];
+    }
+    printf("location part 1 minimum = %lld\n", result1);
+
+
 
     //Part 2
-    int firstTime = 0;
-    for(i=1 ; i<card+1 ; i++)
-    {
-        for(int k=0 ; k<listInstance[i-1] ; k++)
-        {
-            for(j=0 ; j<listNbrMatch[i-1] ; j++)
-            {
-                listInstance[i-1+j+1] += 1;
-            }
-        }
-    }
+    long long temp = 0;
+    result2 = 0x7FFFFFFFFFFFFFFF;
 
-    //Calcul de la somme
-    int totalscratchcard = 0;
-    for(i=0 ; i<card ; i++)
+    temp = seed[0]+seed[1];
+    for(i=seed[0] ; i<(seed[0]+seed[1]) ; i++)
     {
-        totalscratchcard += listInstance[i];
+        temp = moulinette(i, seedToSoil, soilToFertilizer, fertilizerToWater, waterToLight, lightToTemperature, temperatureToHumidity, humidityToLocation);
+        if(temp < result2)
+            result2 = temp;
     }
+    printf("location minimum 1er lot = %lld\n", result2);
 
-    printf("somme des totalscratchcard = %d\n", totalscratchcard);
+    temp = seed[2]+seed[3];
+    for(i=seed[2] ; i<(seed[2]+seed[3]) ; i++)
+    {
+        temp = moulinette(i, seedToSoil, soilToFertilizer, fertilizerToWater, waterToLight, lightToTemperature, temperatureToHumidity, humidityToLocation);
+        if(temp < result2)
+            result2 = temp;
+    }
+    printf("location minimum 2e lot = %lld\n", result2);
+
+    temp = seed[4]+seed[5];
+    for(i=seed[4] ; i<(seed[4]+seed[5]) ; i++)
+    {
+        temp = moulinette(i, seedToSoil, soilToFertilizer, fertilizerToWater, waterToLight, lightToTemperature, temperatureToHumidity, humidityToLocation);
+        if(temp < result2)
+            result2 = temp;
+    }
+    printf("location minimum 3e lot = %lld\n", result2);
+
+    temp = seed[6]+seed[7];
+    temp = seed[6];
+    for(i=seed[6] ; i<(seed[6]+seed[7]) ; i++)
+    {
+        temp = moulinette(i, seedToSoil, soilToFertilizer, fertilizerToWater, waterToLight, lightToTemperature, temperatureToHumidity, humidityToLocation);
+        if(temp < result2)
+            result2 = temp;
+    }
+    printf("location minimum 4e lot = %lld\n", result2);
+
+    for(i=seed[8] ; i<(seed[8]+seed[9]) ; i++)
+    {
+        temp = moulinette(i, seedToSoil, soilToFertilizer, fertilizerToWater, waterToLight, lightToTemperature, temperatureToHumidity, humidityToLocation);
+        if(temp < result2)
+            result2 = temp;
+    }
+    printf("location minimum 5e lot = %lld\n", result2);
+
+    for(i=seed[10] ; i<(seed[10]+seed[11]) ; i++)
+    {
+        temp = moulinette(i, seedToSoil, soilToFertilizer, fertilizerToWater, waterToLight, lightToTemperature, temperatureToHumidity, humidityToLocation);
+        if(temp < result2)
+            result2 = temp;
+    }
+    printf("location minimum 6e lot = %lld\n", result2);
+
+    for(i=seed[12] ; i<(seed[12]+seed[13]) ; i++)
+    {
+        temp = moulinette(i, seedToSoil, soilToFertilizer, fertilizerToWater, waterToLight, lightToTemperature, temperatureToHumidity, humidityToLocation);
+        if(temp < result2)
+            result2 = temp;
+    }
+    printf("location minimum 7e lot = %lld\n", result2);
+
+    for(i=seed[14] ; i<(seed[14]+seed[15]) ; i++)
+    {
+        temp = moulinette(i, seedToSoil, soilToFertilizer, fertilizerToWater, waterToLight, lightToTemperature, temperatureToHumidity, humidityToLocation);
+        if(temp < result2)
+            result2 = temp;
+    }
+    printf("location minimum 8e lot = %lld\n", result2);
+
+    for(i=seed[16] ; i<(seed[16]+seed[17]) ; i++)
+    {
+        temp = moulinette(i, seedToSoil, soilToFertilizer, fertilizerToWater, waterToLight, lightToTemperature, temperatureToHumidity, humidityToLocation);
+        if(temp < result2)
+            result2 = temp;
+    }
+    printf("location minimum 9e lot = %lld\n", result2);
+
+    for(i=seed[18] ; i<(seed[18]+seed[19]) ; i++)
+    {
+        temp = moulinette(i, seedToSoil, soilToFertilizer, fertilizerToWater, waterToLight, lightToTemperature, temperatureToHumidity, humidityToLocation);
+        if(temp < result2)
+            result2 = temp;
+    }
+    printf("location part 2 minimum 10e lot = %lld\n", result2);
 
     fclose(fic);
     fic = NULL;
 
     return 0;
+}
+
+
+
+
+
+
+
+long long moulinette(long long seed, MAP *seedToSoil, MAP *soilToFertilizer, MAP *fertilizerToWater, MAP *waterToLight, MAP *lightToTemperature, MAP *temperatureToHumidity, MAP *humidityToLocation)
+{
+    long long i = 0;
+    long long result = seed;
+
+    for(i=0 ; i<seedToSoil[0].nbrDeTable ; i++)
+    {
+        if((seedToSoil[i].src <= result) && (result < seedToSoil[i].src + seedToSoil[i].len))
+        {
+            result = result - seedToSoil[i].src + seedToSoil[i].dst;
+            break;
+        }
+        else
+            result = result;
+    }
+
+    //printf(", %lld", result);
+
+    for(i=0 ; i<soilToFertilizer[0].nbrDeTable ; i++)
+    {
+        if((soilToFertilizer[i].src <= result) && (result < soilToFertilizer[i].src + soilToFertilizer[i].len))
+        {
+            result = result - soilToFertilizer[i].src + soilToFertilizer[i].dst;
+            break;
+        }
+        else
+            result = result;
+    }
+
+    //printf(", %lld", result);
+
+    for(i=0 ; i<fertilizerToWater[0].nbrDeTable ; i++)
+    {
+        if((fertilizerToWater[i].src <= result) && (result < fertilizerToWater[i].src + fertilizerToWater[i].len))
+        {
+            result = result - fertilizerToWater[i].src + fertilizerToWater[i].dst;
+            break;
+        }
+        else
+            result = result;
+    }
+
+    //printf(", %lld", result);
+
+    for(i=0 ; i<waterToLight[0].nbrDeTable ; i++)
+    {
+        if((waterToLight[i].src <= result) && (result < waterToLight[i].src + waterToLight[i].len))
+        {
+            result = result - waterToLight[i].src + waterToLight[i].dst;
+            break;
+        }
+        else
+            result = result;
+    }
+
+    //printf(", %lld", result);
+
+    for(i=0 ; i<lightToTemperature[0].nbrDeTable ; i++)
+    {
+        if((lightToTemperature[i].src <= result) && (result < lightToTemperature[i].src + lightToTemperature[i].len))
+        {
+            result = result - lightToTemperature[i].src + lightToTemperature[i].dst;
+            break;
+        }
+        else
+            result = result;
+    }
+
+    //printf(", %lld", result);
+
+    for(i=0 ; i<temperatureToHumidity[0].nbrDeTable ; i++)
+    {
+        if((temperatureToHumidity[i].src <= result) && (result < temperatureToHumidity[i].src + temperatureToHumidity[i].len))
+        {
+            result = result - temperatureToHumidity[i].src + temperatureToHumidity[i].dst;
+            break;
+        }
+        else
+            result = result;
+    }
+
+    //printf(", %lld", result);
+
+    for(i=0 ; i<humidityToLocation[0].nbrDeTable ; i++)
+    {
+        if((humidityToLocation[i].src <= result) && (result < humidityToLocation[i].src + humidityToLocation[i].len))
+        {
+            result = result - humidityToLocation[i].src + humidityToLocation[i].dst;
+            break;
+        }
+        else
+            result = result;
+    }
+
+    return result;
 }
