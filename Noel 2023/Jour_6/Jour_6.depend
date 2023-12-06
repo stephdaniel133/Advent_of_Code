@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1701844079 source:/home/stephane/Arduino/Advent_of_Code/Noel 2023/Jour_6/main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	<limits.h>
+
