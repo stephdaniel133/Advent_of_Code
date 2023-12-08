@@ -7,3 +7,11 @@
 	<limits.h>
 	<stdint.h>
 
+1702064662 source:/home/stephane/Arduino/Advent_of_Code/Noel 2023/Jour_7/main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	<limits.h>
+	<stdint.h>
+
