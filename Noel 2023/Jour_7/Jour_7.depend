@@ -1,0 +1,9 @@
+# depslib dependency file v1.0
+1702039907 source:d:\travail\code\advent_of_code\noel 2023\jour_7\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	<limits.h>
+	<stdint.h>
+
