@@ -48,12 +48,11 @@ typedef struct
 int main(int argc, char *argv[])
 {
     char buf[300];
-    char tempstr[100];
     long long i = 0;
     long long j = 0;
     HAND hand[1100];
+    HAND tempHand;
     CARD card = {{'A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'}, {12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0}};
-    char letters[13];
     int handNbr = 0;
     long long result1 = 0;
     long long result2 = 0;
@@ -134,12 +133,40 @@ int main(int argc, char *argv[])
                 hand[i].u.rank.type = HIGH_CARD;
         }
 
+        FILE *fic2 = NULL;
+        fic2 = fopen("data_avant_tri.txt", "w");
+        for(i=0 ; i<handNbr ; i++)
+            fprintf(fic2, "%lld\t%d\n", hand[i].u.ranku, hand[i].bid);
+        fclose(fic2);
+
         //On trie les valeur par rapport au champ hand[i].u.ranku de chaque hand du fichier
         //Plus le le ranku est grand, plus le rang est grand
+        for(i=handNbr-1 ; i>0 ; i--)
+        {
+            for(j=1 ; j<=i ; j++)
+            {
+                if(hand[j-1].u.ranku > hand[j].u.ranku)  //Si la valeur de dessus est supérieure, on permutte les valeurs
+                {
+                    memcpy(&tempHand, &hand[j-1], sizeof(HAND));
+                    memcpy(&hand[j-1], &hand[j], sizeof(HAND));
+                    memcpy(&hand[j], &tempHand, sizeof(HAND));
+                }
+            }
+        }
 
 
+        FILE *fic3 = NULL;
+        fic3 = fopen("data_apres_tri.txt", "w");
+        for(i=0 ; i<handNbr ; i++)
+            fprintf(fic3, "%lld\t%d\n", hand[i].u.ranku, hand[i].bid);
+        fclose(fic3);
 
-        printf("Impossible d'ouvrir le fichier data\n");
+        for(i=0 ; i<handNbr ; i++)
+        {
+            result1 += hand[i].bid * (i+1);
+        }
+
+        printf("Rsultat 1 = %lld\n", result1);
 
     }
     else
