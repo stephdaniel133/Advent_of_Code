@@ -10,7 +10,7 @@
 
 int main(int argc, char *argv[])
 {
-    char buf[400];
+    //char buf[400];
     long long i = 0;
     long long j = 0;
     long long k = 0;
@@ -56,9 +56,9 @@ int main(int argc, char *argv[])
                 for(j=0 ; j<NBR_COL-i ; j++)
                 {
                     tab[i][j][k] = tab[i-1][j+1][k] - tab[i-1][j][k];
-                    //fprintf(fic2, "%d ", tab[i][j][k]);
+                    fprintf(fic2, "%d ", tab[i][j][k]);
                 }
-                //fprintf(fic2, "\n");
+                fprintf(fic2, "\n");
             }
 
             //---------On remonte-----------
@@ -66,20 +66,20 @@ int main(int argc, char *argv[])
             while(i>=0)
             {
                 j = NBR_COL - i;
-                //fprintf(fic2, "%d %d %d\n", tab[i][j][k], tab[i][j-1][k], tab[i+1][j-1][k]);
+                fprintf(fic2, "%d %d %d\n", tab[i][j][k], tab[i][j-1][k], tab[i+1][j-1][k]);
                 tab[i][j][k] = tab[i][j-1][k] + tab[i+1][j-1][k];
 
-                /*for(j=0 ; j<NBR_COL+1-i ; j++)
+                for(j=0 ; j<NBR_COL+1-i ; j++)
                 {
                     fprintf(fic2, "%d ", tab[i][j][k]);
                 }
-                fprintf(fic2, "\n");*/
+                fprintf(fic2, "\n");
                 i--;
                 j++;
             }
 
             result = tab[0][j-2][k];
-            //fprintf(fic2, "Resultat tableau %d = %lld\n\n", k, result);
+            fprintf(fic2, "Resultat tableau %lld = %lld\n\n", k, result);
 
             result1 += result;
             printf("Resultat 1 total = %lld\n\n", result1);
@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
             }
 
             result = tab[0][0][k];
-            fprintf(fic2, "Resultat tableau %d = %lld\n\n", k, result);
+            fprintf(fic2, "Resultat tableau %lld = %lld\n\n", k, result);
 
             result2 += result;
             printf("Resultat 2 total = %lld\n\n", result2);
