@@ -3,56 +3,44 @@
 #include <string.h>
 #include <ctype.h>
 
-int searchdigit(char* str, int* nombre)
+//Tri à bulle
+void sort(int tab[], int taille)
 {
-    if(!strncmp(str, "one", sizeof("one")-1))
+    int i = 0;
+    int j = 0;
+    int temp = 0;
+
+    for(i=0 ; i<taille-1 ; i++)
     {
-        *nombre = 1;
-        return 0;
+        for(j=0 ; j<taille-1 ; j++)
+        {
+            if(tab[j] > tab[j+1])  //Si la valeur de dessus est supérieure, on permutte les valeurs
+            {
+                temp = tab[j];
+                tab[j] = tab[j+1];
+                tab[j+1] = temp;
+            }
+        }
     }
-    else if(!strncmp(str, "two", sizeof("two")-1))
+}
+
+
+int search(int tab[], int taille, int nbrToSearch)
+{
+    int i = 0;
+    int somme = 0;
+
+    for(i=0 ; i<taille ; i++)
     {
-        *nombre = 2;
-        return 0;
-    }
-    else if(!strncmp(str, "three", sizeof("three")-1))
-    {
-        *nombre = 3;
-        return 0;
-    }
-    else if(!strncmp(str, "four", sizeof("four")-1))
-    {
-        *nombre = 4;
-        return 0;
-    }
-    else if(!strncmp(str, "five", sizeof("five")-1))
-    {
-        *nombre = 5;
-        return 0;
-    }
-    else if(!strncmp(str, "six", sizeof("six")-1))
-    {
-        *nombre = 6;
-        return 0;
-    }
-    else if(!strncmp(str, "seven", sizeof("seven")-1))
-    {
-        *nombre = 7;
-        return 0;
-    }
-    else if(!strncmp(str, "eight", sizeof("eight")-1))
-    {
-        *nombre = 8;
-        return 0;
-    }
-    else if(!strncmp(str, "nine", sizeof("nine")-1))
-    {
-        *nombre = 9;
-        return 0;
+        if(tab[i] == nbrToSearch)
+        {
+            somme++;
+        }
     }
 
-    return 1;
+    return somme;
 }
+
 
 int main(int argc, char *argv[])
 {
@@ -61,14 +49,17 @@ int main(int argc, char *argv[])
     int nbrligne = 0;
     int nbr = 0;
     int nbrtemp = 0;
-    int listnbr[2000];
-    int sommenbr = 0;
+    int somme1 = 0;
+    int somme2 = 0;
+    int tab1[1000];
+    int tab2[1000];
 
     FILE *fic = NULL;
 
     fic = fopen("data.txt", "r");
 
-    memset(listnbr, 0, sizeof(listnbr));
+    memset(tab1, 0, sizeof(tab1));
+    memset(tab2, 0, sizeof(tab2));
 
     i = sizeof("one");
 
@@ -79,7 +70,6 @@ int main(int argc, char *argv[])
         while(!feof(fic))
         {
             fgets(buf, 100, fic);
-            //printf("%s, longueur = %d\n", buf, (int)strlen(buf));
 
             if(feof(fic))
             {
@@ -87,39 +77,10 @@ int main(int argc, char *argv[])
             }
             else
             {
-                for(i=0;i<strlen(buf);i++)
-                {
-                    if(isdigit(buf[i]))
-                    {
-                        nbr = (buf[i]-48) * 10;
-                        break;
-                    }
-                    if(!searchdigit(&buf[i], &nbrtemp))
-                    {
-                        nbr = nbrtemp * 10;
-                        break;
-                    }
-                }
-                for(i=strlen(buf)-1;i>=0;i--)
-                {
-                    if(isdigit(buf[i]))
-                    {
-                        nbr += buf[i]-48;
-                        break;
-                    }
-                    if(!searchdigit(&buf[i], &nbrtemp))
-                    {
-                        nbr += nbrtemp;
-                        break;
-                    }
-                }
-                printf("%s, longueur = %d, nbr = %d\n", buf, (int)strlen(buf), nbr);
+                sscanf(buf, "%d %d", &tab1[nbrligne], &tab2[nbrligne]);
+                //printf("nbr1= %d, nbr2= %d\n", tab1[nbrligne], tab2[nbrligne]);
             }
 
-            //On ajoute à la liste de nombres
-            listnbr[nbrligne] = nbr;
-            //On calcule la somme de tous les nombres
-            sommenbr += nbr;
             nbrligne++;
         }
     }
@@ -128,7 +89,24 @@ int main(int argc, char *argv[])
         printf("Impossible d'ouvrir le fichier data\n");
     }
 
-    printf("somme des nombres = %d\n", sommenbr);
+    sort(tab1, 1000);
+    sort(tab2, 1000);
+
+    for(i=0 ; i<1000 ; i++)
+    {
+        somme1 += abs(tab2[i] - tab1[i]);
+    }
+
+    printf("somme1 des distances = %d\n", somme1);
+
+
+    //--------------Part 2-----------------
+    for(i=0 ; i<1000 ; i++)
+    {
+        somme2 += tab1[i] * search(tab2, 1000, tab1[i]);
+    }
+
+    printf("somme2 = %d\n", somme2);
 
     fclose(fic);
     fic = NULL;
