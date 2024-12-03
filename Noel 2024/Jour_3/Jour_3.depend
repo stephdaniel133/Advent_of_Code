@@ -1,7 +1,8 @@
 # depslib dependency file v1.0
-1733148478 source:d:\travail\code\advent_of_code\noel 2024\jour_3\main.c
+1733236844 source:d:\travail\code\advent_of_code\noel 2024\jour_3\main.c
 	<stdio.h>
 	<stdlib.h>
+	<stdint.h>
 	<string.h>
 	<ctype.h>
 

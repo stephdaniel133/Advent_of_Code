@@ -1,84 +1,27 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <ctype.h>
-
-//Fonction qui teste une ligne unique
-int isSafe(int tab[2000][10], int ligne)
-{
-    int i = 0;
-    int isSafe = 0; // = 1 when safe
-
-
-    //On teste les conditions increase
-    if((tab[ligne][1] > tab[ligne][0]) && (tab[ligne][1] <= tab[ligne][0]+3))
-    {
-        i = 2;
-
-        while(tab[ligne][i] != -1)
-        {
-            if((tab[ligne][i] > tab[ligne][i-1]) && (tab[ligne][i] <= tab[ligne][i-1]+3))
-            {
-                isSafe = 1;
-                i++;
-            }
-            else
-            {
-                isSafe = 0;
-                break;
-            }
-        }
-    }
-    //On teste les conditions decrease
-    else if((tab[ligne][0] > tab[ligne][1]) && (tab[ligne][0] <= tab[ligne][1]+3))
-    {
-        i = 2;
-
-        while(tab[ligne][i] != -1)
-        {
-            if((tab[ligne][i-1] > tab[ligne][i]) && (tab[ligne][i-1] <= tab[ligne][i]+3))
-            {
-                isSafe = 1;
-                i++;
-            }
-            else
-            {
-                isSafe = 0;
-                break;
-            }
-        }
-    }
-    else
-    {
-        isSafe = 0;  //Les 2 valeurs sont égales, la condition n'est pas respectée, on sort de la fonction
-    }
-
-    return isSafe;
-}
-
-
-
 
 
 int main(int argc, char *argv[])
 {
-    char buf[100];
-    int i = 0;
-    int nbrligne = 0;
-    int somme1 = 0;
-    int somme2 = 0;
-    int tab1[2000][10];
-    int tab2[2000][10];
-    int tabResult[2000];
-
-
     FILE *fic = NULL;
+    int64_t somme1 = 0;
+    int64_t somme2 = 0;
+    char c = 0;
+    int etape = 0;
+    int nbr1 = 0;
+    int nbr2 = 0;
+    int mulvalid = 1;
+    int etapevalide = 0;
+    int etapeinvalide = 0;
+
+    //      mul(xxx,y  y  y  )
+    //etape 123456789 10 11 12
 
     fic = fopen("data.txt", "r");
-
-    memset(tab1, -1, sizeof(tab1)); //Initialise à -1 parce qu'il n'y a pas de valeur négative dans les données
-
-    i = sizeof("one");
 
     if(fic != NULL)
     {
@@ -86,7 +29,7 @@ int main(int argc, char *argv[])
 
         while(!feof(fic))
         {
-            fgets(buf, 100, fic);
+            c = fgetc(fic);
 
             if(feof(fic))
             {
@@ -94,11 +37,257 @@ int main(int argc, char *argv[])
             }
             else
             {
-                sscanf(buf, "%d %d %d %d %d %d %d %d", &tab1[nbrligne][0], &tab1[nbrligne][1], &tab1[nbrligne][2], &tab1[nbrligne][3], &tab1[nbrligne][4], &tab1[nbrligne][5], &tab1[nbrligne][6], &tab1[nbrligne][7]);
-                //printf("nbr1= %d, nbr2= %d\n", tab1[nbrligne], tab2[nbrligne]);
-            }
+                switch(c)
+                {
+                    case 'm':
+                        if(etape == 0)
+                            etape = 1;
+                        break;
+                    case 'u':
+                        if(etape == 1)
+                            etape = 2;
+                        break;
+                    case 'l':
+                        if(etape == 2)
+                            etape = 3;
+                        break;
+                    case '(':
+                        if(etape == 3)
+                            etape = 4;
+                        break;
+                    case '0':
+                    case '1':
+                    case '2':
+                    case '3':
+                    case '4':
+                    case '5':
+                    case '6':
+                    case '7':
+                    case '8':
+                    case '9':
+                        if((etape == 4) || (etape == 5) || (etape == 6))
+                        {
+                            nbr1 = 10*nbr1 + atoi(&c);
+                            etape ++;
+                        }
+                        else if((etape == 8) || (etape == 9) || (etape == 10))
+                        {
+                            nbr2 = 10*nbr2 + atoi(&c);
+                            etape ++;
+                        }
+                        break;
 
-            nbrligne++;
+                    case ',':
+                        if((etape == 5) || (etape == 6) || (etape == 7))
+                            etape = 8;
+                        break;
+
+                    case ')':
+                        if((etape == 9) || (etape == 10) || (etape == 11))
+                        {
+                            etape = 0;
+                            if((nbr1 < 1000) && (nbr2 < 1000))
+                            {
+                                somme1 += nbr1 * nbr2;
+                                nbr1 = 0;
+                                nbr2 = 0;
+                            }
+                        }
+                        break;
+                    default:
+                        etape = 0;
+                        nbr1 = 0;
+                        nbr2 = 0;
+                        break;
+                }
+            }
+        }
+    }
+    else
+    {
+        printf("Impossible d'ouvrir le fichier data\n");
+    }
+
+    fclose(fic);
+    fic = NULL;
+
+    printf("somme1 = %lld\n", somme1);
+
+
+
+
+
+    //--------------Part 2-----------------
+    fic = fopen("data.txt", "r");
+
+    int nbrDO = 0;
+    int nbrDONT = 0;
+
+    //           do()     don't()
+    //etapevalid 1234     56789 10 11 12
+    if(fic != NULL)
+    {
+        printf("fichier ouvert\n");
+
+        while(!feof(fic))
+        {
+            c = fgetc(fic);
+
+            if(feof(fic))
+            {
+                break;
+            }
+            else
+            {
+                switch(c)
+                {
+                    case 'd':
+                        if(etapevalide == 0)
+                        {
+                            etape = 0;
+                            etapevalide = 1;
+                        }
+                        if(etapeinvalide == 0)
+                        {
+                            etape = 0;
+                            etapeinvalide = 1;
+                        }
+                        break;
+                    case 'o':
+                        if(etapevalide == 1)
+                        {
+                            etape = 0;
+                            etapevalide = 2;
+                        }
+                        if(etapeinvalide == 1)
+                        {
+                            etape = 0;
+                            etapeinvalide = 2;
+                        }
+                        break;
+                    case 'n':
+                        if(etapeinvalide == 2)
+                        {
+                            etape = 0;
+                            etapevalide = 0;
+                            etapeinvalide = 3;
+                        }
+                        break;
+                    case '\'':
+                        if(etapeinvalide == 3)
+                        {
+                            etape = 0;
+                            etapevalide = 0;
+                            etapeinvalide = 4;
+                        }
+                        break;
+                    case 't':
+                        if(etapeinvalide == 4)
+                        {
+                            etape = 0;
+                            etapevalide = 0;
+                            etapeinvalide = 5;
+                        }
+                        break;
+
+                    case 'm':
+                        if(etape == 0)
+                            etape = 1;
+                        break;
+                    case 'u':
+                        if(etape == 1)
+                            etape = 2;
+                        break;
+                    case 'l':
+                        if(etape == 2)
+                            etape = 3;
+                        break;
+                    case '(':
+                        if(etape == 3)
+                        {
+                            etape = 4;
+                            etapevalide = 0;
+                            etapeinvalide = 0;
+                        }
+                        if(etapevalide == 2)
+                        {
+                            etape = 0;
+                            etapevalide = 3;
+                            etapeinvalide = 0;
+                        }
+                        if(etapeinvalide == 5)
+                        {
+                            etape = 0;
+                            etapevalide = 0;
+                            etapeinvalide = 6;
+                        }
+                        break;
+                    case '0':
+                    case '1':
+                    case '2':
+                    case '3':
+                    case '4':
+                    case '5':
+                    case '6':
+                    case '7':
+                    case '8':
+                    case '9':
+                        if((etape == 4) || (etape == 5) || (etape == 6))
+                        {
+                            nbr1 = 10*nbr1 + atoi(&c);
+                            etape ++;
+                        }
+                        else if((etape == 8) || (etape == 9) || (etape == 10))
+                        {
+                            nbr2 = 10*nbr2 + atoi(&c);
+                            etape ++;
+                        }
+                        break;
+
+                    case ',':
+                        if((etape == 5) || (etape == 6) || (etape == 7))
+                            etape = 8;
+                        break;
+
+                    case ')':
+                        if((etape == 9) || (etape == 10) || (etape == 11))
+                        {
+                            if((nbr1 < 1000) && (nbr2 < 1000) && (mulvalid == 1))
+                            {
+                                somme2 += nbr1 * nbr2;
+                            }
+                            etape = 0;
+                            nbr1 = 0;
+                            nbr2 = 0;
+                            etapevalide = 0;
+                            etapeinvalide = 0;
+                        }
+                        if(etapevalide == 3)    //fin du do()
+                        {
+                            etape = 0;
+                            etapevalide = 0;
+                            etapeinvalide = 0;
+                            mulvalid = 1;
+                            nbrDO++;
+                        }
+                        if(etapeinvalide == 6)  //fin du don't()
+                        {
+                            etape = 0;
+                            etapevalide = 0;
+                            etapeinvalide = 0;
+                            mulvalid = 0;
+                            nbrDONT++;
+                        }
+                        break;
+                    default:
+                        etape = 0;
+                        etapevalide = 0;
+                        etapeinvalide = 0;
+                        nbr1 = 0;
+                        nbr2 = 0;
+                        break;
+                }
+            }
         }
     }
     else
@@ -107,185 +296,11 @@ int main(int argc, char *argv[])
     }
 
 
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        somme1 += isSafe(tab1, i);
-    }
-
-    printf("somme1 = %d\n", somme1);
 
 
-    //--------------Part 2-----------------
-    //On va retirer une à une les colonne du tableau et repasser l'algorithme de recherche des lignes SAFE
-
-    //On cherche les SAFE dans le tableau initial
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tabResult[i] += isSafe(tab1, i);
-    }
-
-    //Puis on cherche dans les tableaux tronqués d'une colonne et on additionne les SAFE supplémentaires
-
-    //On retire la colonne 0
-    memset(tab2, -1, sizeof(tab2));
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tab2[i][0] = tab1[i][1];
-        tab2[i][1] = tab1[i][2];
-        tab2[i][2] = tab1[i][3];
-        tab2[i][3] = tab1[i][4];
-        tab2[i][4] = tab1[i][5];
-        tab2[i][5] = tab1[i][6];
-        tab2[i][6] = tab1[i][7];
-    }
-
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tabResult[i] += isSafe(tab2, i);
-    }
-
-    //On retire la colonne 1
-    memset(tab2, -1, sizeof(tab2));
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tab2[i][0] = tab1[i][0];
-        tab2[i][1] = tab1[i][2];
-        tab2[i][2] = tab1[i][3];
-        tab2[i][3] = tab1[i][4];
-        tab2[i][4] = tab1[i][5];
-        tab2[i][5] = tab1[i][6];
-        tab2[i][6] = tab1[i][7];
-    }
-
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tabResult[i] += isSafe(tab2, i);
-    }
-
-    //On retire la colonne 2
-    memset(tab2, -1, sizeof(tab2));
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tab2[i][0] = tab1[i][0];
-        tab2[i][1] = tab1[i][1];
-        tab2[i][2] = tab1[i][3];
-        tab2[i][3] = tab1[i][4];
-        tab2[i][4] = tab1[i][5];
-        tab2[i][5] = tab1[i][6];
-        tab2[i][6] = tab1[i][7];
-    }
-
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tabResult[i] += isSafe(tab2, i);
-    }
-
-
-    //On retire la colonne 3
-    memset(tab2, -1, sizeof(tab2));
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tab2[i][0] = tab1[i][0];
-        tab2[i][1] = tab1[i][1];
-        tab2[i][2] = tab1[i][2];
-        tab2[i][3] = tab1[i][4];
-        tab2[i][4] = tab1[i][5];
-        tab2[i][5] = tab1[i][6];
-        tab2[i][6] = tab1[i][7];
-    }
-
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tabResult[i] += isSafe(tab2, i);
-    }
-
-
-    //On retire la colonne 4
-    memset(tab2, -1, sizeof(tab2));
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tab2[i][0] = tab1[i][0];
-        tab2[i][1] = tab1[i][1];
-        tab2[i][2] = tab1[i][2];
-        tab2[i][3] = tab1[i][3];
-        tab2[i][4] = tab1[i][5];
-        tab2[i][5] = tab1[i][6];
-        tab2[i][6] = tab1[i][7];
-    }
-
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tabResult[i] += isSafe(tab2, i);
-    }
-
-
-    //On retire la colonne 5
-    memset(tab2, -1, sizeof(tab2));
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tab2[i][0] = tab1[i][0];
-        tab2[i][1] = tab1[i][1];
-        tab2[i][2] = tab1[i][2];
-        tab2[i][3] = tab1[i][3];
-        tab2[i][4] = tab1[i][4];
-        tab2[i][5] = tab1[i][6];
-        tab2[i][6] = tab1[i][7];
-    }
-
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tabResult[i] += isSafe(tab2, i);
-    }
-
-
-    //On retire la colonne 6
-    memset(tab2, -1, sizeof(tab2));
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tab2[i][0] = tab1[i][0];
-        tab2[i][1] = tab1[i][1];
-        tab2[i][2] = tab1[i][2];
-        tab2[i][3] = tab1[i][3];
-        tab2[i][4] = tab1[i][4];
-        tab2[i][5] = tab1[i][5];
-        tab2[i][6] = tab1[i][7];
-    }
-
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tabResult[i] += isSafe(tab2, i);
-    }
-
-
-    //On retire la colonne 7
-    memset(tab2, -1, sizeof(tab2));
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tab2[i][0] = tab1[i][0];
-        tab2[i][1] = tab1[i][1];
-        tab2[i][2] = tab1[i][2];
-        tab2[i][3] = tab1[i][3];
-        tab2[i][4] = tab1[i][4];
-        tab2[i][5] = tab1[i][5];
-        tab2[i][6] = tab1[i][6];
-    }
-
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tabResult[i] += isSafe(tab2, i);
-    }
-
-
-    //On termine par ocmpter le nombre de lignes bonnes
-    for(i=0 ; i<1000 ; i++)
-    {
-        if(tabResult[i] > 0)
-        {
-            somme2 += 1;
-        }
-    }
-
-    printf("somme2 = %d\n", somme2);
+    printf("somme2 = %lld\n", somme2);
+    //99.256.789 too low
+    //99.959.008 too high
 
     fclose(fic);
     fic = NULL;
