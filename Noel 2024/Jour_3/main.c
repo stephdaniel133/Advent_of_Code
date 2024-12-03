@@ -120,9 +120,6 @@ int main(int argc, char *argv[])
     //--------------Part 2-----------------
     fic = fopen("data.txt", "r");
 
-    int nbrDO = 0;
-    int nbrDONT = 0;
-
     //           do()     don't()
     //etapevalid 1234     56789 10 11 12
     if(fic != NULL)
@@ -142,55 +139,55 @@ int main(int argc, char *argv[])
                 switch(c)
                 {
                     case 'd':
+                        etape = 0;
                         if(etapevalide == 0)
                         {
-                            etape = 0;
                             etapevalide = 1;
                         }
                         if(etapeinvalide == 0)
                         {
-                            etape = 0;
                             etapeinvalide = 1;
                         }
                         break;
                     case 'o':
+                        etape = 0;
                         if(etapevalide == 1)
                         {
-                            etape = 0;
                             etapevalide = 2;
                         }
                         if(etapeinvalide == 1)
                         {
-                            etape = 0;
                             etapeinvalide = 2;
                         }
                         break;
                     case 'n':
+                        etape = 0;
                         if(etapeinvalide == 2)
                         {
-                            etape = 0;
                             etapevalide = 0;
                             etapeinvalide = 3;
                         }
                         break;
                     case '\'':
+                        etape = 0;
                         if(etapeinvalide == 3)
                         {
-                            etape = 0;
                             etapevalide = 0;
                             etapeinvalide = 4;
                         }
                         break;
                     case 't':
+                        etape = 0;
                         if(etapeinvalide == 4)
                         {
-                            etape = 0;
                             etapevalide = 0;
                             etapeinvalide = 5;
                         }
                         break;
 
                     case 'm':
+                        nbr1 = 0;
+                        nbr2 = 0;
                         if(etape == 0)
                             etape = 1;
                         break;
@@ -268,7 +265,6 @@ int main(int argc, char *argv[])
                             etapevalide = 0;
                             etapeinvalide = 0;
                             mulvalid = 1;
-                            nbrDO++;
                         }
                         if(etapeinvalide == 6)  //fin du don't()
                         {
@@ -276,7 +272,6 @@ int main(int argc, char *argv[])
                             etapevalide = 0;
                             etapeinvalide = 0;
                             mulvalid = 0;
-                            nbrDONT++;
                         }
                         break;
                     default:
@@ -296,11 +291,7 @@ int main(int argc, char *argv[])
     }
 
 
-
-
     printf("somme2 = %lld\n", somme2);
-    //99.256.789 too low
-    //99.959.008 too high
 
     fclose(fic);
     fic = NULL;
