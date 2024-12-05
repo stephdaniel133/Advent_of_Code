@@ -1,0 +1,9 @@
+# depslib dependency file v1.0
+1733410736 source:d:\travail\code\advent_of_code\noel 2024\jour_6\main.c
+	<stdio.h>
+	<stdlib.h>
+	<stdint.h>
+	<stdbool.h>
+	<string.h>
+	<ctype.h>
+
