@@ -4,12 +4,16 @@
 #include <stdbool.h>
 #include <string.h>
 #include <ctype.h>
+#include <time.h>
 
-#define NBR_LINES   10
-#define NBR_COL     10
-//#define NBR_LINES   130
-//#define NBR_COL     130
 
+//#define NBR_LINES   10
+//#define NBR_COL     10
+#define NBR_LINES   130
+#define NBR_COL     130
+
+
+//Attention l'algo prend 1526s (25mn) pour trouver les solutions
 
 int main(int argc, char *argv[])
 {
@@ -19,14 +23,18 @@ int main(int argc, char *argv[])
     char buf[NBR_COL+1];
     char tab[NBR_LINES][NBR_COL];
     char tab1[NBR_LINES][NBR_COL];
-    char tab2[NBR_LINES][NBR_COL];
+    uint16_t tab2[NBR_LINES][NBR_COL];
+    char tabtemp[NBR_LINES][NBR_COL];
     char tabOriginal[NBR_LINES][NBR_COL];
     int i = 0;
     int j = 0;
     int k = 0;
+    int l = 0;
     int xcur = 0;
     int ycur = 0;
-    int c =0;
+    int xcurOriginal = 0;
+    int ycurOriginal = 0;
+    bool boucle = 0;
 
 
     memset(tab, '0', sizeof(tab));
@@ -227,6 +235,9 @@ int main(int argc, char *argv[])
         }
     }
 
+    xcurOriginal = xcur;
+    ycurOriginal = ycur;
+
     memcpy(tabOriginal, tab, NBR_LINES*NBR_COL);
 
 
@@ -235,12 +246,17 @@ int main(int argc, char *argv[])
         for(j=0 ; j<NBR_COL ; j++)
         {
             memcpy(tab, tabOriginal, NBR_LINES*NBR_COL);    //On reprend la tableau original
-            memset(tab1, '.', sizeof(tab1));
-            memset(tab2, '.', sizeof(tab2));
+            memset(tab2, 0, sizeof(tab2));
 
             if(tab[i][j] != '#')
             {
-                tab[i][j] = '#';
+                //On prend le temps
+                if(!((i==xcurOriginal) && (j==ycurOriginal)))
+                    tab[i][j] = '#';
+                xcur = xcurOriginal;
+                ycur = ycurOriginal;
+
+                memcpy(tabtemp, tab, sizeof(tab));
 
                 //On a créé un nouveau tableau, il faut tester si on a créé une boucle inifie
                 while(1)
@@ -249,7 +265,8 @@ int main(int argc, char *argv[])
                     {
                         if(xcur==0)
                         {
-                            tab1[xcur][ycur] = '1';
+                            tab2[xcur][ycur]++;
+                            boucle = false;
                             break;
                         }
                         else if(tab[xcur-1][ycur] == '#')
@@ -260,14 +277,15 @@ int main(int argc, char *argv[])
                         {
                             xcur--;
                             tab[xcur][ycur] = '^';
-                            tab1[xcur][ycur] = '1';
+                            tab2[xcur][ycur]++;
                         }
                     }
                     else if(tab[xcur][ycur] == '>')
                     {
                         if(ycur==NBR_COL-1)
                         {
-                            tab1[xcur][ycur] = '1';
+                            tab2[xcur][ycur]++;
+                            boucle = false;
                             break;
                         }
                         else if(tab[xcur][ycur+1] == '#')
@@ -278,14 +296,15 @@ int main(int argc, char *argv[])
                         {
                             ycur++;
                             tab[xcur][ycur] = '>';
-                            tab1[xcur][ycur] = '1';
+                            tab2[xcur][ycur]++;
                         }
                     }
                     else if(tab[xcur][ycur] == 'v')
                     {
                         if(xcur==NBR_LINES-1)
                         {
-                            tab1[xcur][ycur] = '1';
+                            tab2[xcur][ycur]++;
+                            boucle = false;
                             break;
                         }
                         else if(tab[xcur+1][ycur] == '#')
@@ -296,14 +315,15 @@ int main(int argc, char *argv[])
                         {
                             xcur++;
                             tab[xcur][ycur] = 'v';
-                            tab1[xcur][ycur] = '1';
+                            tab2[xcur][ycur]++;
                         }
                     }
                     else if(tab[xcur][ycur] == '<')
                     {
                         if(ycur==0)
                         {
-                            tab1[xcur][ycur] = '1';
+                            tab2[xcur][ycur]++;
+                            boucle = false;
                             break;
                         }
                         else if(tab[xcur][ycur-1] == '#')
@@ -314,14 +334,45 @@ int main(int argc, char *argv[])
                         {
                             ycur--;
                             tab[xcur][ycur] = '<';
-                            tab1[xcur][ycur] = '1';
+                            tab2[xcur][ycur]++;
                         }
                     }
-                    c=0;
+
+                    if(memcmp(tab, tabtemp, sizeof(tab)) == 0)
+                    {
+                        boucle = true;
+                        printf("Boucle coordonnees x = %d, y = %d\n", i, j);
+                        break;
+                    }
+                    else
+                    {
+                        memcpy(tabtemp, tab, sizeof(tab));
+                    }
+
+                    for(k=0 ; k<NBR_LINES ; k++)
+                    {
+                        for(l=0 ; l<NBR_COL ; l++)
+                        {
+                            if(tab2[k][l] > 1000)
+                            {
+                                boucle = true;
+                            }
+                        }
+                    }
+
+                    if(boucle == true)
+                    {
+                        printf("Boucle coordonnees x = %d, y = %d\n", i, j);
+                        break;
+                    }
+
                 }       //Fin while
-                printf("Fin while\n");
 
-
+                if(boucle == true)
+                {
+                    somme2++;
+                    boucle = false;
+                }
             }
         }   //Fin for j
     }   //Fin for i
