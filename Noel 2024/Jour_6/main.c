@@ -5,19 +5,11 @@
 #include <string.h>
 #include <ctype.h>
 
+#define NBR_LINES   10
+#define NBR_COL     10
+//#define NBR_LINES   130
+//#define NBR_COL     130
 
-int searchNumber(int tab[], int number)
-{
-    int i = 0;
-
-    for(i = 0; i<23 ; i++)
-    {
-        if(tab[i] == number)
-            return i;
-    }
-
-    return 100;  //Le nombre de pages à tester est inférieur
-}
 
 
 int main(int argc, char *argv[])
@@ -25,27 +17,20 @@ int main(int argc, char *argv[])
     FILE *fic = NULL;
     int64_t somme1 = 0;
     int64_t somme2 = 0;
-    int rulePage = 0;
-    int rule[1200][2];
-    int page[200][23];
-    int pagenumber[200];
-    bool truth1[200];
-    bool truth2[200];
-    int temp1 = 0;
-    int temp2 = 0;
+    char buf[NBR_COL+1];
+    char tab[NBR_LINES][NBR_COL];
+    char tab1[NBR_LINES][NBR_COL];
+    char tabOriginal[NBR_LINES][NBR_COL];
     int i = 0;
     int j = 0;
     int k = 0;
-    char c = 0;
-    int index1 = 0;
-    int index2 = 0;
-    int stop = 1;
+    int xcur = 0;
+    int ycur = 0;
 
 
-    memset(rule, 0, sizeof(rule));
-    memset(page, 0, sizeof(page));
-    memset(pagenumber, 0, sizeof(pagenumber));
-    memset(truth1, 1, sizeof(truth1));    //Les lignes sont considérées bonnes
+    memset(tab, '0', sizeof(tab));
+    memset(tab1, '0', sizeof(tab1));
+
 
 
     //Récupération des valeurs dans le fichier data
@@ -55,46 +40,11 @@ int main(int argc, char *argv[])
     {
         printf("fichier ouvert\n");
 
-        while(!feof(fic))
+        for(i=0 ; i<NBR_LINES ; i++)
         {
-            if(rulePage == 0)           //On recupere les rules
-            {
-                temp1 = 0;
-                temp2 = 0;
-                fscanf(fic, "%d|%d", &temp1, &temp2);
-                if((temp1 != 0) && (temp2 != 0))
-                {
-                    rule[i][0] = temp1;
-                    rule[i][1] = temp2;
-                    i++;
-                }
-                else        //On a atteint le saut de ligne separant les pages des rules
-                {
-                    rulePage = 1;
-                    printf("Fin rules, rule[0] = %d|%d, rule[%d] = %d|%d\n", rule[0][0], rule[0][1], i-1, rule[i-1][0], rule[i-1][1]);
-                    //page[0][0] = temp1; //Le dernier scanf a récupérer le premier nombre
-                    fseek(fic, -2, SEEK_CUR);
-                    i = 0;
-                    j = 0;
-                }
-            }
-            else                        //On recupere les pages
-            {
-                fscanf(fic, "%d", &temp1);
-                c = fgetc(fic);
-                if(c == ',')        //Si on detecte une virgule après le nombre, il y en a encore
-                {
-                    page[i][j] = temp1;
-                    pagenumber[i]++;
-                    j++;
-                }
-                else                //Sinon on passe sur la liste de pages suivantes
-                {
-                    page[i][j] = temp1;
-                    i++;
-                    j = 0;
-                }
-            }
+            fgets(buf, NBR_COL+1, fic);
+            memcpy(tab[i], buf, NBR_COL);
+            fgetc(fic); //On echappe le saut à la ligne
         }
     }
     else
@@ -104,100 +54,158 @@ int main(int argc, char *argv[])
     fclose(fic);
     fic = NULL;
 
-    //Impression des pages complètes
-    /*for(i=0 ; i<194 ; i++)
+    //Impression du puzzle complet
+    /*for(i=0 ; i<NBR_LINES ; i++)
     {
-        for(j=0 ; j<23 ; j++)
+        for(j=0 ; j<NBR_COL ; j++)
         {
-            printf("%02d ", page[i][j]);
+            printf("%c ", tab[i][j]);
         }
         printf("\n");
     }*/
 
-
-    for(i=0 ; i<194 ; i++)   //Defilement des lignes de pages
+    //Detection du caractere de départ
+    for(i=0 ; i<NBR_LINES ; i++)
     {
-        for(k=0 ; k<1176 ; k++)   //Defilement des lignes des rules
+        for(j=0 ; j<NBR_COL ; j++)
         {
-            index1 = searchNumber(page[i], rule[k][0]);
-            index2 = searchNumber(page[i], rule[k][1]);
-
-            if((index1 > index2) && (index1 != 100) && (index2 != 100))     //Si le nombre de gauche est à droite
+            if(tab[i][j] == '^')
             {
-                truth1[i] = 0;   //La règle n'est pas respectée
-                break;
+                xcur = i;
+                ycur = j;
+                tab1[xcur][ycur] = '1';
             }
         }
     }
 
-    //On additionne toutes les pages qui respectent les règles
-    for(i=0 ; i<194 ; i++)
+
+
+    while(1)
     {
-        if(truth1[i] == 1)
-            somme1 += page[i][pagenumber[i]/2];
+        if(tab[xcur][ycur] == '^')
+        {
+            if(tab[xcur-1][ycur] == '#')
+            {
+                tab[xcur][ycur] = '>';
+            }
+            else
+            {
+                if(xcur<0)
+                {
+                    break;
+                }
+                else
+                {
+                    xcur--;
+                }
+                tab[xcur][ycur] = '^';
+                tab1[xcur][ycur] = '1';
+            }
+        }
+        else if(tab[xcur][ycur] == '>')
+        {
+            if(tab[xcur][ycur+1] == '#')
+            {
+                tab[xcur][ycur] = 'v';
+            }
+            else
+            {
+                if(ycur>NBR_COL-2)
+                {
+                    break;
+                }
+                else
+                {
+                    ycur++;
+                }
+                tab[xcur][ycur] = '>';
+                tab1[xcur][ycur] = '1';
+            }
+        }
+        else if(tab[xcur][ycur] == 'v')
+        {
+            if(tab[xcur+1][ycur] == '#')
+            {
+                tab[xcur][ycur] = '<';
+            }
+            else
+            {
+                if(xcur>NBR_LINES-2)
+                {
+                    break;
+                }
+                else
+                {
+                    xcur++;
+                }
+                tab[xcur][ycur] = 'v';
+                tab1[xcur][ycur] = '1';
+            }
+        }
+        else if(tab[xcur][ycur] == '<')
+        {
+            if(tab[xcur][ycur-1] == '#')
+            {
+                tab[xcur][ycur] = '^';
+            }
+            else
+            {
+                if(ycur<0)
+                {
+                    break;
+                }
+                else
+                {
+                    ycur--;
+                }
+                tab[xcur][ycur] = '<';
+                tab1[xcur][ycur] = '1';
+            }
+        }
     }
 
 
-    printf("somme1 = %lld\n", somme1);
+    //On compte le nombre de positions
+    for(i=0 ; i<NBR_LINES ; i++)
+    {
+        for(j=0 ; j<NBR_COL ; j++)
+        {
+            if(tab1[i][j] == '1')
+            {
+                somme1++;
+            }
+        }
+    }
+
+    printf("somme1 = %ld\n", somme1);
 
 
 
     //--------------Part 2-----------------
-    stop = 1;
+    //On enregistre le puzzle original
+    memcpy(tabOriginal, tab, NBR_LINES*NBR_COL);
 
-    while(stop != 0)    //On repete les permutations jusqu'à ce que toutes les règles sont respectées
+    for(i=0 ; i<NBR_LINES ; i++)
     {
-        for(i=0 ; i<194 ; i++)   //Defilement des lignes de pages
+        for(j=0 ; j<NBR_COL ; j++)
         {
-            for(k=0 ; k<1176 ; k++)   //Defilement des lignes des rules
+            memcpy(tab, tabOriginal, NBR_LINES*NBR_COL);    //On reprend la tableau original
+
+            if(tab[i][j] != '#')
             {
-                index1 = searchNumber(page[i], rule[k][0]);
-                index2 = searchNumber(page[i], rule[k][1]);
+                tab[i][j] = '#';
 
-                if((index1 > index2) && (index1 != 100) && (index2 != 100))     //Si le nombre de gauche est à droite
-                {
-                    int temp = 0;
-                    temp = page[i][index1];   //La règle n'est pas respectée donc on permute les valeurs
-                    page[i][index1] = page[i][index2];
-                    page[i][index2] = temp;
-                    break;
-                }
-            }
-        }
+                //On a créé un nouveau tableau, il faut tester si on a créé une boucle inifie
 
-        memset(truth2, 1, sizeof(truth1));
-        stop = 0;
 
-        //On vérifie les règles s'ils elles sont toutes bonnes (A commenter)
-        for(i=0 ; i<194 ; i++)   //Defilement des lignes de pages
-        {
-            for(k=0 ; k<1176 ; k++)   //Defilement des lignes des rules
-            {
-                index1 = searchNumber(page[i], rule[k][0]);
-                index2 = searchNumber(page[i], rule[k][1]);
 
-                if((index1 > index2) && (index1 != 100) && (index2 != 100))     //Si le nombre de gauche est à droite
-                {
-                    truth2[i] = 0;   //La règle n'est pas respectée
-                    stop++;
-                    break;
-                }
+
+
             }
         }
     }
 
-
-    //Les règles sont toutes bonnes, on additionne toutes les pages qui ne respectaient pas les règles de la question précédente
-    for(i=0 ; i<194 ; i++)
-    {
-        if(truth1[i] == 0)
-        {
-            somme2 += page[i][pagenumber[i]/2];
-        }
-        //printf("truth1[%d] = %d, %d\n", i, truth1[i], truth2[i]);
-    }
-
-    printf("somme2 = %lld\n", somme2);
+    printf("somme2 = %ld\n", somme2);
 
     return 0;
 }
