@@ -8,37 +8,185 @@
 
 
 //#define NBR_LINES   10
-//#define NBR_COL     10
-#define NBR_LINES   130
-#define NBR_COL     130
+#define NBR_LINES   860
+#define NBR_OPE_MAX 15
 
 
-//Attention l'algo prend 1526s (25mn) pour trouver les solutions
+//Renvoi si le résultat est trouvé
+bool recur1(int line_nbr, uint64_t resultToFind, int col, uint32_t tabNum[][NBR_OPE_MAX], uint64_t previousResult, bool found)
+{
+    if(found == true)
+        return true;
+    else if(tabNum[line_nbr][col] == 0)
+    {
+        return false;   //On a atteint le nombre max de nombres on retourne
+    }
+    else if(resultToFind == (previousResult * tabNum[line_nbr][col]) && (tabNum[line_nbr][col+1] == 0))
+    {
+        return true;
+    }
+    else if(resultToFind == (previousResult + tabNum[line_nbr][col]) && (tabNum[line_nbr][col+1] == 0))
+    {
+        return true;
+    }
+    else if(true == recur1(line_nbr, resultToFind, col+1, tabNum, previousResult * tabNum[line_nbr][col], found))
+    {
+        return true;
+    }
+    else if(true == recur1(line_nbr, resultToFind, col+1, tabNum, previousResult + tabNum[line_nbr][col], found))
+    {
+        return true;
+    }
+    else
+        return false;
+}
+
+
+//Renvoi si le résultat est trouvé
+bool recur2(int line_nbr, uint64_t resultToFind, int col, uint32_t tabNum[][NBR_OPE_MAX], uint64_t previousResult, bool found)
+{
+    char buf1[50];
+    char buf2[50];
+    uint64_t temp = 0;
+
+
+    if(found == true)
+        return true;
+    else if(col == 0)
+    {
+        if(true == recur2(line_nbr, resultToFind, 1, tabNum, tabNum[line_nbr][0], found))
+            return true;
+    }
+    else
+    {
+        if(tabNum[line_nbr][col] == 0)
+        {
+            return false;   //On a atteint le nombre max de nombres on retourne
+        }
+        else if(resultToFind == (previousResult * tabNum[line_nbr][col]) && (tabNum[line_nbr][col+1] == 0))
+        {
+            return true;
+        }
+        else if(resultToFind == (previousResult + tabNum[line_nbr][col]) && (tabNum[line_nbr][col+1] == 0))
+        {
+            return true;
+        }
+        else if(true == recur2(line_nbr, resultToFind, col+1, tabNum, previousResult * tabNum[line_nbr][col], found))
+        {
+            return true;
+        }
+        else if(true == recur2(line_nbr, resultToFind, col+1, tabNum, previousResult + tabNum[line_nbr][col], found))
+        {
+            return true;
+        }
+        else
+        {
+            if(tabNum[line_nbr][col] != 0)
+            {
+                //On recole les nombre avec l'operateur ||
+                memset(buf1, '\0', sizeof(buf1));
+                memset(buf2, '\0', sizeof(buf2));
+
+                sprintf(buf1, "%ld", previousResult);    //On converti en ASCII le resultat precedent
+                sprintf(buf2, "%d", tabNum[line_nbr][col]);
+                strcat(buf1, buf2);
+                temp = atol(buf1);
+
+                if((tabNum[line_nbr][col+1] == 0) && (resultToFind == temp))
+                    return true;
+
+
+                if(true == recur2(line_nbr, resultToFind, col+1, tabNum, temp, found))
+                {
+                    return true;
+                }
+            }
+            else
+                return false;
+        }
+    }
+
+    return false;
+}
+
+/*bool recur2(int line_nbr, uint64_t resultToFind, int col, uint32_t tabNum[][NBR_OPE_MAX], uint64_t previousResult, bool found)
+{
+    char buf1[50];
+    char buf2[50];
+    uint64_t temp = 0;
+
+    uint64_t res = 0;
+
+    if(found == true)
+        return true;
+    else if(col == 0)
+    {
+        if(true == recur2(line_nbr, resultToFind, 1, tabNum, tabNum[line_nbr][0], found))
+            return true;
+    }
+    else
+    {
+        if(tabNum[line_nbr][col] == 0)
+        {
+            return false;   //On a atteint le nombre max de nombres on retourne
+        }
+        else if(resultToFind == (previousResult * tabNum[line_nbr][col]) && (tabNum[line_nbr][col+1] == 0))
+        {
+            return true;
+        }
+        else if(resultToFind == (previousResult + tabNum[line_nbr][col]) && (tabNum[line_nbr][col+1] == 0))
+        {
+            return true;
+        }
+        else if(true == recur2(line_nbr, resultToFind, col+1, tabNum, previousResult * tabNum[line_nbr][col], found))
+        {
+            return true;
+        }
+        else if(true == recur2(line_nbr, resultToFind, col+1, tabNum, previousResult + tabNum[line_nbr][col], found))
+        {
+            return true;
+        }
+        else
+        {
+            if(tabNum[line_nbr][col] != 0)
+            {
+                //On recole les nombre avec l'operateur ||
+                memset(buf1, '\0', sizeof(buf1));
+                memset(buf2, '\0', sizeof(buf2));
+
+                sprintf(buf1, "%d", previousResult);    //On converti en ASCII le resultat precedent
+                sprintf(buf2, "%d", tabNum[line_nbr][col]);
+                strcat(buf1, buf2);
+                temp = atol(buf1);
+
+                if(true == recur2(line_nbr, resultToFind, col+1, tabNum, temp, found))
+                {
+                    return true;
+                }
+            }
+            else
+                return false;
+        }
+    }
+}*/
+
 
 int main(int argc, char *argv[])
 {
     FILE *fic = NULL;
-    int64_t somme1 = 0;
+    uint64_t somme1 = 0;
     int64_t somme2 = 0;
-    char buf[NBR_COL+1];
-    char tab[NBR_LINES][NBR_COL];
-    char tab1[NBR_LINES][NBR_COL];
-    uint16_t tab2[NBR_LINES][NBR_COL];
-    char tabtemp[NBR_LINES][NBR_COL];
-    char tabOriginal[NBR_LINES][NBR_COL];
+    char buf[100];
+    uint64_t tab[NBR_LINES];
+    uint32_t tab1[NBR_LINES][NBR_OPE_MAX];
+    bool tabResult[NBR_LINES];
+    int nbr_lignes = 0;
     int i = 0;
-    int j = 0;
-    int k = 0;
-    int l = 0;
-    int xcur = 0;
-    int ycur = 0;
-    int xcurOriginal = 0;
-    int ycurOriginal = 0;
-    bool boucle = 0;
 
 
-    memset(tab, '0', sizeof(tab));
-    memset(tab1, '0', sizeof(tab1));
+    memset(tab, 0, sizeof(tab));
+    memset(tab1, 0, sizeof(tab1));
+    memset(tabResult, false, sizeof(tabResult));
 
 
 
@@ -48,12 +196,16 @@ int main(int argc, char *argv[])
     if(fic != NULL)
     {
         printf("fichier ouvert\n");
+        i = 0;
 
-        for(i=0 ; i<NBR_LINES ; i++)
+        while(!feof(fic))
         {
-            fgets(buf, NBR_COL+1, fic);
-            memcpy(tab[i], buf, NBR_COL);
-            fgetc(fic); //On echappe le saut à la ligne
+            memset(buf, '\0', sizeof(buf));
+            fgets(buf, 100, fic);
+            sscanf(buf, "%ld: %d %d %d %d %d %d %d %d %d %d %d %d %d %d", &tab[i], &tab1[i][0], &tab1[i][1], &tab1[i][2], &tab1[i][3], &tab1[i][4]
+                                                                      , &tab1[i][5], &tab1[i][6], &tab1[i][7], &tab1[i][8], &tab1[i][9]
+                                                                      , &tab1[i][10], &tab1[i][11], &tab1[i][12], &tab1[i][13]);
+            i++;
         }
     }
     else
@@ -63,321 +215,56 @@ int main(int argc, char *argv[])
     fclose(fic);
     fic = NULL;
 
+    nbr_lignes = i;
 
-    //Impression du puzzle complet
-    /*for(i=0 ; i<NBR_LINES ; i++)
+    printf("Nombre de lignes: %d\n", nbr_lignes);
+
+    printf("tab[0] = %ld\n", tab[0]);
+    printf("tab1[0][0] = %d\n", tab1[0][0]);
+    printf("tab[%d] = %ld\n", nbr_lignes-1, tab[nbr_lignes-1]);
+    printf("tab1[%d][4] = %d\n", nbr_lignes-1, tab1[nbr_lignes-1][4]);
+
+    for(i = 0 ; i<nbr_lignes ; i++)
     {
-        for(j=0 ; j<NBR_COL ; j++)
-        {
-            printf("%c ", tab[i][j]);
-        }
-        printf("\n");
+        tabResult[i] = recur1(i, tab[i], 1, tab1, tab1[i][0], false);
     }
-    printf("\n");*/
 
-
-    //Detection du caractere de départ
-    for(i=0 ; i<NBR_LINES ; i++)
+    //On compte le score
+    for(i = 0 ; i<nbr_lignes ; i++)
     {
-        for(j=0 ; j<NBR_COL ; j++)
+        if(true == tabResult[i])
         {
-            if(tab[i][j] == '^')
-            {
-                xcur = i;
-                ycur = j;
-                tab1[xcur][ycur] = '1';
-            }
+            printf("Ligne bonne %d\n", i);
+            somme1 += tab[i];
         }
     }
 
-
-
-    while(1)
-    {
-        if(tab[xcur][ycur] == '^')
-        {
-            if(xcur==0)
-            {
-                tab1[xcur][ycur] = '1';
-                break;
-            }
-            else if(tab[xcur-1][ycur] == '#')
-            {
-                tab[xcur][ycur] = '>';
-            }
-            else
-            {
-                xcur--;
-                tab[xcur][ycur] = '^';
-                tab1[xcur][ycur] = '1';
-            }
-        }
-        else if(tab[xcur][ycur] == '>')
-        {
-            if(ycur==NBR_COL-1)
-            {
-                tab1[xcur][ycur] = '1';
-                break;
-            }
-            else if(tab[xcur][ycur+1] == '#')
-            {
-                tab[xcur][ycur] = 'v';
-            }
-            else
-            {
-                ycur++;
-                tab[xcur][ycur] = '>';
-                tab1[xcur][ycur] = '1';
-            }
-        }
-        else if(tab[xcur][ycur] == 'v')
-        {
-            if(xcur==NBR_LINES-1)
-            {
-                tab1[xcur][ycur] = '1';
-                break;
-            }
-            else if(tab[xcur+1][ycur] == '#')
-            {
-                tab[xcur][ycur] = '<';
-            }
-            else
-            {
-                xcur++;
-                tab[xcur][ycur] = 'v';
-                tab1[xcur][ycur] = '1';
-            }
-        }
-        else if(tab[xcur][ycur] == '<')
-        {
-            if(ycur==0)
-            {
-                tab1[xcur][ycur] = '1';
-                break;
-            }
-            else if(tab[xcur][ycur-1] == '#')
-            {
-                tab[xcur][ycur] = '^';
-            }
-            else
-            {
-                ycur--;
-                tab[xcur][ycur] = '<';
-                tab1[xcur][ycur] = '1';
-            }
-        }
-    }
-
-
-    //Impression du resultat complet
-    /*for(i=0 ; i<NBR_LINES ; i++)
-    {
-        for(j=0 ; j<NBR_COL ; j++)
-        {
-            printf("%c ", tab1[i][j]);
-        }
-        printf("\n");
-    }
-    printf("\n");*/
-
-
-    //On compte le nombre de positions
-    for(i=0 ; i<NBR_LINES ; i++)
-    {
-        for(j=0 ; j<NBR_COL ; j++)
-        {
-            if(tab1[i][j] == '1')
-            {
-                somme1++;
-            }
-        }
-    }
-
-    printf("Somme1 = %ld\n", somme1);
-
-
+    printf("\nSomme1 = %ld\n\n", somme1);
 
 
 
     //--------------Part 2-----------------
-    //Récupération des valeurs dans le fichier data
-    fic = fopen("data.txt", "r");
+    //On remet à 0 les résultats
+    memset(tabResult, false, sizeof(tabResult));
 
-    if(fic != NULL)
+    for(i = 0 ; i<nbr_lignes ; i++)
     {
-        printf("fichier ouvert\n");
-
-        for(i=0 ; i<NBR_LINES ; i++)
-        {
-            fgets(buf, NBR_COL+1, fic);
-            memcpy(tab[i], buf, NBR_COL);
-            fgetc(fic); //On echappe le saut à la ligne
-        }
+        tabResult[i] = recur2(i, tab[i], 0, tab1, 0, false);
     }
-    else
-    {
-        printf("Impossible d'ouvrir le fichier data\n");
-    }
-    fclose(fic);
-    fic = NULL;
 
-    //Detection du caractere de départ
-    for(i=0 ; i<NBR_LINES ; i++)
+    //On compte le score
+    for(i = 0 ; i<nbr_lignes ; i++)
     {
-        for(j=0 ; j<NBR_COL ; j++)
+        if(true == tabResult[i])
         {
-            if(tab[i][j] == '^')
-            {
-                xcur = i;
-                ycur = j;
-                tab1[xcur][ycur] = '1';
-            }
+            printf("Ligne bonne %d\n", i);
+            somme2 += tab[i];
         }
     }
 
-    xcurOriginal = xcur;
-    ycurOriginal = ycur;
+    printf("\nSomme2 = %ld\n", somme2);
 
-    memcpy(tabOriginal, tab, NBR_LINES*NBR_COL);
-
-
-    for(i=0 ; i<NBR_LINES ; i++)
-    {
-        for(j=0 ; j<NBR_COL ; j++)
-        {
-            memcpy(tab, tabOriginal, NBR_LINES*NBR_COL);    //On reprend la tableau original
-            memset(tab2, 0, sizeof(tab2));
-
-            if(tab[i][j] != '#')
-            {
-                //On prend le temps
-                if(!((i==xcurOriginal) && (j==ycurOriginal)))
-                    tab[i][j] = '#';
-                xcur = xcurOriginal;
-                ycur = ycurOriginal;
-
-                memcpy(tabtemp, tab, sizeof(tab));
-
-                //On a créé un nouveau tableau, il faut tester si on a créé une boucle inifie
-                while(1)
-                {
-                    if(tab[xcur][ycur] == '^')
-                    {
-                        if(xcur==0)
-                        {
-                            tab2[xcur][ycur]++;
-                            boucle = false;
-                            break;
-                        }
-                        else if(tab[xcur-1][ycur] == '#')
-                        {
-                            tab[xcur][ycur] = '>';
-                        }
-                        else
-                        {
-                            xcur--;
-                            tab[xcur][ycur] = '^';
-                            tab2[xcur][ycur]++;
-                        }
-                    }
-                    else if(tab[xcur][ycur] == '>')
-                    {
-                        if(ycur==NBR_COL-1)
-                        {
-                            tab2[xcur][ycur]++;
-                            boucle = false;
-                            break;
-                        }
-                        else if(tab[xcur][ycur+1] == '#')
-                        {
-                            tab[xcur][ycur] = 'v';
-                        }
-                        else
-                        {
-                            ycur++;
-                            tab[xcur][ycur] = '>';
-                            tab2[xcur][ycur]++;
-                        }
-                    }
-                    else if(tab[xcur][ycur] == 'v')
-                    {
-                        if(xcur==NBR_LINES-1)
-                        {
-                            tab2[xcur][ycur]++;
-                            boucle = false;
-                            break;
-                        }
-                        else if(tab[xcur+1][ycur] == '#')
-                        {
-                            tab[xcur][ycur] = '<';
-                        }
-                        else
-                        {
-                            xcur++;
-                            tab[xcur][ycur] = 'v';
-                            tab2[xcur][ycur]++;
-                        }
-                    }
-                    else if(tab[xcur][ycur] == '<')
-                    {
-                        if(ycur==0)
-                        {
-                            tab2[xcur][ycur]++;
-                            boucle = false;
-                            break;
-                        }
-                        else if(tab[xcur][ycur-1] == '#')
-                        {
-                            tab[xcur][ycur] = '^';
-                        }
-                        else
-                        {
-                            ycur--;
-                            tab[xcur][ycur] = '<';
-                            tab2[xcur][ycur]++;
-                        }
-                    }
-
-                    if(memcmp(tab, tabtemp, sizeof(tab)) == 0)
-                    {
-                        boucle = true;
-                        printf("Boucle coordonnees x = %d, y = %d\n", i, j);
-                        break;
-                    }
-                    else
-                    {
-                        memcpy(tabtemp, tab, sizeof(tab));
-                    }
-
-                    for(k=0 ; k<NBR_LINES ; k++)
-                    {
-                        for(l=0 ; l<NBR_COL ; l++)
-                        {
-                            if(tab2[k][l] > 1000)
-                            {
-                                boucle = true;
-                            }
-                        }
-                    }
-
-                    if(boucle == true)
-                    {
-                        printf("Boucle coordonnees x = %d, y = %d\n", i, j);
-                        break;
-                    }
-
-                }       //Fin while
-
-                if(boucle == true)
-                {
-                    somme2++;
-                    boucle = false;
-                }
-            }
-        }   //Fin for j
-    }   //Fin for i
-
-    printf("Somme2 = %ld\n", somme2);
+    // 22304359036022 too low
 
     return 0;
 }
