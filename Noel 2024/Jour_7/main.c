@@ -87,10 +87,10 @@ bool recur2(int line_nbr, uint64_t resultToFind, int col, uint32_t tabNum[][NBR_
                 memset(buf1, '\0', sizeof(buf1));
                 memset(buf2, '\0', sizeof(buf2));
 
-                sprintf(buf1, "%ld", previousResult);    //On converti en ASCII le resultat precedent
+                sprintf(buf1, "%lld", previousResult);    //On converti en ASCII le resultat precedent
                 sprintf(buf2, "%d", tabNum[line_nbr][col]);
                 strcat(buf1, buf2);
-                temp = atol(buf1);
+                temp = atoll(buf1);
 
                 if((tabNum[line_nbr][col+1] == 0) && (resultToFind == temp))
                     return true;
@@ -109,66 +109,6 @@ bool recur2(int line_nbr, uint64_t resultToFind, int col, uint32_t tabNum[][NBR_
     return false;
 }
 
-/*bool recur2(int line_nbr, uint64_t resultToFind, int col, uint32_t tabNum[][NBR_OPE_MAX], uint64_t previousResult, bool found)
-{
-    char buf1[50];
-    char buf2[50];
-    uint64_t temp = 0;
-
-    uint64_t res = 0;
-
-    if(found == true)
-        return true;
-    else if(col == 0)
-    {
-        if(true == recur2(line_nbr, resultToFind, 1, tabNum, tabNum[line_nbr][0], found))
-            return true;
-    }
-    else
-    {
-        if(tabNum[line_nbr][col] == 0)
-        {
-            return false;   //On a atteint le nombre max de nombres on retourne
-        }
-        else if(resultToFind == (previousResult * tabNum[line_nbr][col]) && (tabNum[line_nbr][col+1] == 0))
-        {
-            return true;
-        }
-        else if(resultToFind == (previousResult + tabNum[line_nbr][col]) && (tabNum[line_nbr][col+1] == 0))
-        {
-            return true;
-        }
-        else if(true == recur2(line_nbr, resultToFind, col+1, tabNum, previousResult * tabNum[line_nbr][col], found))
-        {
-            return true;
-        }
-        else if(true == recur2(line_nbr, resultToFind, col+1, tabNum, previousResult + tabNum[line_nbr][col], found))
-        {
-            return true;
-        }
-        else
-        {
-            if(tabNum[line_nbr][col] != 0)
-            {
-                //On recole les nombre avec l'operateur ||
-                memset(buf1, '\0', sizeof(buf1));
-                memset(buf2, '\0', sizeof(buf2));
-
-                sprintf(buf1, "%d", previousResult);    //On converti en ASCII le resultat precedent
-                sprintf(buf2, "%d", tabNum[line_nbr][col]);
-                strcat(buf1, buf2);
-                temp = atol(buf1);
-
-                if(true == recur2(line_nbr, resultToFind, col+1, tabNum, temp, found))
-                {
-                    return true;
-                }
-            }
-            else
-                return false;
-        }
-    }
-}*/
 
 
 int main(int argc, char *argv[])
@@ -202,7 +142,7 @@ int main(int argc, char *argv[])
         {
             memset(buf, '\0', sizeof(buf));
             fgets(buf, 100, fic);
-            sscanf(buf, "%ld: %d %d %d %d %d %d %d %d %d %d %d %d %d %d", &tab[i], &tab1[i][0], &tab1[i][1], &tab1[i][2], &tab1[i][3], &tab1[i][4]
+            sscanf(buf, "%lld: %d %d %d %d %d %d %d %d %d %d %d %d %d %d", &tab[i], &tab1[i][0], &tab1[i][1], &tab1[i][2], &tab1[i][3], &tab1[i][4]
                                                                       , &tab1[i][5], &tab1[i][6], &tab1[i][7], &tab1[i][8], &tab1[i][9]
                                                                       , &tab1[i][10], &tab1[i][11], &tab1[i][12], &tab1[i][13]);
             i++;
@@ -219,9 +159,9 @@ int main(int argc, char *argv[])
 
     printf("Nombre de lignes: %d\n", nbr_lignes);
 
-    printf("tab[0] = %ld\n", tab[0]);
+    printf("tab[0] = %lld\n", tab[0]);
     printf("tab1[0][0] = %d\n", tab1[0][0]);
-    printf("tab[%d] = %ld\n", nbr_lignes-1, tab[nbr_lignes-1]);
+    printf("tab[%d] = %lld\n", nbr_lignes-1, tab[nbr_lignes-1]);
     printf("tab1[%d][4] = %d\n", nbr_lignes-1, tab1[nbr_lignes-1][4]);
 
     for(i = 0 ; i<nbr_lignes ; i++)
@@ -239,7 +179,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    printf("\nSomme1 = %ld\n\n", somme1);
+    printf("\nSomme1 = %lld\n\n", somme1);
 
 
 
@@ -262,9 +202,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    printf("\nSomme2 = %ld\n", somme2);
-
-    // 22304359036022 too low
+    printf("\nSomme2 = %lld\n", somme2);
 
     return 0;
 }
