@@ -7,8 +7,6 @@
 #include <time.h>
 
 
-//#define NBR_LINES   4
-//#define NBR_COL     4
 //#define NBR_LINES   8
 //#define NBR_COL     8
 #define NBR_LINES   52
@@ -84,15 +82,10 @@ int main(int argc, char *argv[])
     unsigned char tab[NBR_LINES][NBR_COL];
     unsigned char tab1[NBR_LINES][NBR_COL];
     unsigned char tab2[NBR_LINES][NBR_COL];
-    int tab3[NBR_LINES][NBR_COL];
-    int tab4[NBR_LINES][NBR_COL];
     int i = 0;
     int j = 0;
     int k = 0;
     int l = 0;
-    int xcur = 0;
-    int ycur = 0;
-    bool boucle = 0;
 
 
     memset(tab, '.', sizeof(tab));
@@ -189,10 +182,6 @@ int main(int argc, char *argv[])
 
     //--------------Part 2-----------------
     //Récupération des valeurs dans le fichier data
-
-
-
-
 
     memset(tab1, 0, sizeof(tab1));
     memset(tab2, 0, sizeof(tab2));
