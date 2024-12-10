@@ -233,7 +233,7 @@ int main(int argc, char *argv[])
     }
 
 
-    printf("\nSomme1 = %ld\n\n", somme1);
+    printf("\nSomme1 = %lld\n\n", somme1);
 
     //Reponse 6291146824486
 
@@ -460,210 +460,208 @@ int main(int argc, char *argv[])
 
     for(i = 0 ; i<(sizeof(tab)/sizeof(int64_t)) ; i++)
     {
-        fprintf(fic1, "tab[%ld] = %ld\n", i, tab[i]);
+        fprintf(fic1, "tab[%lld] = %lld\n", i, tab[i]);
     }
     fclose(fic1);
     fic1 = NULL;
 
 
-    for(k = 0 ; k<10 ; k++)
+
+    i = index - 1;
+    do
     {
-        i = index - 1;
-        do
+        if(taille_index[i][0] == 1)
         {
-            if(taille_index[i][0] == 1)
+            for(j=0 ; (j<(sizeof(tab)/sizeof(tab[1]))) && (taille_index[i][1] > j) ; j++)
             {
-                for(j=0 ; (j<(sizeof(tab)/sizeof(tab[1]))) && (taille_index[i][1] > j) ; j++)
+                if((tab[j] == -1))
                 {
-                    if((tab[j] == -1))
-                    {
-                        tab[j]   = i;
-                        tab[taille_index[i][1]]   = -1;
-                        break;
-                    }
+                    tab[j]   = i;
+                    tab[taille_index[i][1]]   = -1;
+                    break;
                 }
             }
-
-            if(taille_index[i][0] == 2)
-            {
-                for(j=0 ; (j<(sizeof(tab)/sizeof(tab[1]))) && (taille_index[i][1] > j) ; j++)
-                {
-                    if((tab[j] == -1) && (tab[j+1] == -1))
-                    {
-                        tab[j]   = i;
-                        tab[j+1] = i;
-                        tab[taille_index[i][1]]   = -1;
-                        tab[taille_index[i][1]+1] = -1;
-                        break;
-                    }
-                }
-            }
-
-            if(taille_index[i][0] == 3)
-            {
-                for(j=0 ; (j<(sizeof(tab)/sizeof(tab[1]))) && (taille_index[i][1] > j) ; j++)
-                {
-                    if((tab[j] == -1) && (tab[j+1] == -1) && (tab[j+2] == -1))
-                    {
-                        tab[j]   = i;
-                        tab[j+1] = i;
-                        tab[j+2] = i;
-                        tab[taille_index[i][1]]   = -1;
-                        tab[taille_index[i][1]+1] = -1;
-                        tab[taille_index[i][1]+2] = -1;
-                        break;
-                    }
-                }
-            }
-
-            if(taille_index[i][0] == 4)
-            {
-                for(j=0 ; (j<(sizeof(tab)/sizeof(tab[1]))) && (taille_index[i][1] > j) ; j++)
-                {
-                    if((tab[j] == -1) && (tab[j+1] == -1) && (tab[j+2] == -1) && (tab[j+3] == -1))
-                    {
-                        tab[j]   = i;
-                        tab[j+1] = i;
-                        tab[j+2] = i;
-                        tab[j+3] = i;
-                        tab[taille_index[i][1]]   = -1;
-                        tab[taille_index[i][1]+1] = -1;
-                        tab[taille_index[i][1]+2] = -1;
-                        tab[taille_index[i][1]+3] = -1;
-                        break;
-                    }
-                }
-            }
-
-            if(taille_index[i][0] == 5)
-            {
-                for(j=0 ; (j<(sizeof(tab)/sizeof(tab[1]))) && (taille_index[i][1] > j) ; j++)
-                {
-                    if((tab[j] == -1) && (tab[j+1] == -1) && (tab[j+2] == -1) && (tab[j+3] == -1) && (tab[j+4] == -1))
-                    {
-                        tab[j]   = i;
-                        tab[j+1] = i;
-                        tab[j+2] = i;
-                        tab[j+3] = i;
-                        tab[j+4] = i;
-                        tab[taille_index[i][1]]   = -1;
-                        tab[taille_index[i][1]+1] = -1;
-                        tab[taille_index[i][1]+2] = -1;
-                        tab[taille_index[i][1]+3] = -1;
-                        tab[taille_index[i][1]+4] = -1;
-                        break;
-                    }
-                }
-            }
-
-            if(taille_index[i][0] == 6)
-            {
-                for(j=0 ; (j<(sizeof(tab)/sizeof(tab[1]))) && (taille_index[i][1] > j) ; j++)
-                {
-                    if((tab[j] == -1) && (tab[j+1] == -1) && (tab[j+2] == -1) && (tab[j+3] == -1) && (tab[j+4] == -1) && (tab[j+5] == -1))
-                    {
-                        tab[j]   = i;
-                        tab[j+1] = i;
-                        tab[j+2] = i;
-                        tab[j+3] = i;
-                        tab[j+4] = i;
-                        tab[j+5] = i;
-                        tab[taille_index[i][1]]   = -1;
-                        tab[taille_index[i][1]+1] = -1;
-                        tab[taille_index[i][1]+2] = -1;
-                        tab[taille_index[i][1]+3] = -1;
-                        tab[taille_index[i][1]+4] = -1;
-                        tab[taille_index[i][1]+5] = -1;
-                        break;
-                    }
-                }
-            }
-
-            if(taille_index[i][0] == 7)
-            {
-                for(j=0 ; (j<(sizeof(tab)/sizeof(tab[1]))) && (taille_index[i][1] > j) ; j++)
-                {
-                    if((tab[j] == -1) && (tab[j+1] == -1) && (tab[j+2] == -1) && (tab[j+3] == -1) && (tab[j+4] == -1) && (tab[j+5] == -1) && (tab[j+6] == -1))
-                    {
-                        tab[j]   = i;
-                        tab[j+1] = i;
-                        tab[j+2] = i;
-                        tab[j+3] = i;
-                        tab[j+4] = i;
-                        tab[j+5] = i;
-                        tab[j+6] = i;
-                        tab[taille_index[i][1]]   = -1;
-                        tab[taille_index[i][1]+1] = -1;
-                        tab[taille_index[i][1]+2] = -1;
-                        tab[taille_index[i][1]+3] = -1;
-                        tab[taille_index[i][1]+4] = -1;
-                        tab[taille_index[i][1]+5] = -1;
-                        tab[taille_index[i][1]+6] = -1;
-                        break;
-                    }
-                }
-            }
-
-            if(taille_index[i][0] == 8)
-            {
-                for(j=0 ; (j<(sizeof(tab)/sizeof(tab[1]))) && (taille_index[i][1] > j) ; j++)
-                {
-                    if((tab[j] == -1) && (tab[j+1] == -1) && (tab[j+2] == -1) && (tab[j+3] == -1) && (tab[j+4] == -1) && (tab[j+5] == -1) && (tab[j+6] == -1) && (tab[j+7] == -1))
-                    {
-                        tab[j]   = i;
-                        tab[j+1] = i;
-                        tab[j+2] = i;
-                        tab[j+3] = i;
-                        tab[j+4] = i;
-                        tab[j+5] = i;
-                        tab[j+6] = i;
-                        tab[j+7] = i;
-                        tab[taille_index[i][1]]   = -1;
-                        tab[taille_index[i][1]+1] = -1;
-                        tab[taille_index[i][1]+2] = -1;
-                        tab[taille_index[i][1]+3] = -1;
-                        tab[taille_index[i][1]+4] = -1;
-                        tab[taille_index[i][1]+5] = -1;
-                        tab[taille_index[i][1]+6] = -1;
-                        tab[taille_index[i][1]+7] = -1;
-                        break;
-                    }
-                }
-            }
-
-            if(taille_index[i][0] == 9)
-            {
-                for(j=0 ; (j<(sizeof(tab)/sizeof(tab[1]))) && (taille_index[i][1] > j) ; j++)
-                {
-                    if((tab[j] == -1) && (tab[j+1] == -1) && (tab[j+2] == -1) && (tab[j+3] == -1) && (tab[j+4] == -1) && (tab[j+5] == -1) && (tab[j+6] == -1) && (tab[j+7] == -1) && (tab[j+8] == -1))
-                    {
-                        tab[j]   = i;
-                        tab[j+1] = i;
-                        tab[j+2] = i;
-                        tab[j+3] = i;
-                        tab[j+4] = i;
-                        tab[j+5] = i;
-                        tab[j+6] = i;
-                        tab[j+7] = i;
-                        tab[j+8] = i;
-                        tab[taille_index[i][1]]   = -1;
-                        tab[taille_index[i][1]+1] = -1;
-                        tab[taille_index[i][1]+2] = -1;
-                        tab[taille_index[i][1]+3] = -1;
-                        tab[taille_index[i][1]+4] = -1;
-                        tab[taille_index[i][1]+5] = -1;
-                        tab[taille_index[i][1]+6] = -1;
-                        tab[taille_index[i][1]+7] = -1;
-                        tab[taille_index[i][1]+8] = -1;
-                        break;
-                    }
-                }
-            }
-
-            i--;    //Index suivant
         }
-        while(i > 0);   //On fait défiler les index avec i
+
+        if(taille_index[i][0] == 2)
+        {
+            for(j=0 ; (j<(sizeof(tab)/sizeof(tab[1]))) && (taille_index[i][1] > j) ; j++)
+            {
+                if((tab[j] == -1) && (tab[j+1] == -1))
+                {
+                    tab[j]   = i;
+                    tab[j+1] = i;
+                    tab[taille_index[i][1]]   = -1;
+                    tab[taille_index[i][1]+1] = -1;
+                    break;
+                }
+            }
+        }
+
+        if(taille_index[i][0] == 3)
+        {
+            for(j=0 ; (j<(sizeof(tab)/sizeof(tab[1]))) && (taille_index[i][1] > j) ; j++)
+            {
+                if((tab[j] == -1) && (tab[j+1] == -1) && (tab[j+2] == -1))
+                {
+                    tab[j]   = i;
+                    tab[j+1] = i;
+                    tab[j+2] = i;
+                    tab[taille_index[i][1]]   = -1;
+                    tab[taille_index[i][1]+1] = -1;
+                    tab[taille_index[i][1]+2] = -1;
+                    break;
+                }
+            }
+        }
+
+        if(taille_index[i][0] == 4)
+        {
+            for(j=0 ; (j<(sizeof(tab)/sizeof(tab[1]))) && (taille_index[i][1] > j) ; j++)
+            {
+                if((tab[j] == -1) && (tab[j+1] == -1) && (tab[j+2] == -1) && (tab[j+3] == -1))
+                {
+                    tab[j]   = i;
+                    tab[j+1] = i;
+                    tab[j+2] = i;
+                    tab[j+3] = i;
+                    tab[taille_index[i][1]]   = -1;
+                    tab[taille_index[i][1]+1] = -1;
+                    tab[taille_index[i][1]+2] = -1;
+                    tab[taille_index[i][1]+3] = -1;
+                    break;
+                }
+            }
+        }
+
+        if(taille_index[i][0] == 5)
+        {
+            for(j=0 ; (j<(sizeof(tab)/sizeof(tab[1]))) && (taille_index[i][1] > j) ; j++)
+            {
+                if((tab[j] == -1) && (tab[j+1] == -1) && (tab[j+2] == -1) && (tab[j+3] == -1) && (tab[j+4] == -1))
+                {
+                    tab[j]   = i;
+                    tab[j+1] = i;
+                    tab[j+2] = i;
+                    tab[j+3] = i;
+                    tab[j+4] = i;
+                    tab[taille_index[i][1]]   = -1;
+                    tab[taille_index[i][1]+1] = -1;
+                    tab[taille_index[i][1]+2] = -1;
+                    tab[taille_index[i][1]+3] = -1;
+                    tab[taille_index[i][1]+4] = -1;
+                    break;
+                }
+            }
+        }
+
+        if(taille_index[i][0] == 6)
+        {
+            for(j=0 ; (j<(sizeof(tab)/sizeof(tab[1]))) && (taille_index[i][1] > j) ; j++)
+            {
+                if((tab[j] == -1) && (tab[j+1] == -1) && (tab[j+2] == -1) && (tab[j+3] == -1) && (tab[j+4] == -1) && (tab[j+5] == -1))
+                {
+                    tab[j]   = i;
+                    tab[j+1] = i;
+                    tab[j+2] = i;
+                    tab[j+3] = i;
+                    tab[j+4] = i;
+                    tab[j+5] = i;
+                    tab[taille_index[i][1]]   = -1;
+                    tab[taille_index[i][1]+1] = -1;
+                    tab[taille_index[i][1]+2] = -1;
+                    tab[taille_index[i][1]+3] = -1;
+                    tab[taille_index[i][1]+4] = -1;
+                    tab[taille_index[i][1]+5] = -1;
+                    break;
+                }
+            }
+        }
+
+        if(taille_index[i][0] == 7)
+        {
+            for(j=0 ; (j<(sizeof(tab)/sizeof(tab[1]))) && (taille_index[i][1] > j) ; j++)
+            {
+                if((tab[j] == -1) && (tab[j+1] == -1) && (tab[j+2] == -1) && (tab[j+3] == -1) && (tab[j+4] == -1) && (tab[j+5] == -1) && (tab[j+6] == -1))
+                {
+                    tab[j]   = i;
+                    tab[j+1] = i;
+                    tab[j+2] = i;
+                    tab[j+3] = i;
+                    tab[j+4] = i;
+                    tab[j+5] = i;
+                    tab[j+6] = i;
+                    tab[taille_index[i][1]]   = -1;
+                    tab[taille_index[i][1]+1] = -1;
+                    tab[taille_index[i][1]+2] = -1;
+                    tab[taille_index[i][1]+3] = -1;
+                    tab[taille_index[i][1]+4] = -1;
+                    tab[taille_index[i][1]+5] = -1;
+                    tab[taille_index[i][1]+6] = -1;
+                    break;
+                }
+            }
+        }
+
+        if(taille_index[i][0] == 8)
+        {
+            for(j=0 ; (j<(sizeof(tab)/sizeof(tab[1]))) && (taille_index[i][1] > j) ; j++)
+            {
+                if((tab[j] == -1) && (tab[j+1] == -1) && (tab[j+2] == -1) && (tab[j+3] == -1) && (tab[j+4] == -1) && (tab[j+5] == -1) && (tab[j+6] == -1) && (tab[j+7] == -1))
+                {
+                    tab[j]   = i;
+                    tab[j+1] = i;
+                    tab[j+2] = i;
+                    tab[j+3] = i;
+                    tab[j+4] = i;
+                    tab[j+5] = i;
+                    tab[j+6] = i;
+                    tab[j+7] = i;
+                    tab[taille_index[i][1]]   = -1;
+                    tab[taille_index[i][1]+1] = -1;
+                    tab[taille_index[i][1]+2] = -1;
+                    tab[taille_index[i][1]+3] = -1;
+                    tab[taille_index[i][1]+4] = -1;
+                    tab[taille_index[i][1]+5] = -1;
+                    tab[taille_index[i][1]+6] = -1;
+                    tab[taille_index[i][1]+7] = -1;
+                    break;
+                }
+            }
+        }
+
+        if(taille_index[i][0] == 9)
+        {
+            for(j=0 ; (j<(sizeof(tab)/sizeof(tab[1]))) && (taille_index[i][1] > j) ; j++)
+            {
+                if((tab[j] == -1) && (tab[j+1] == -1) && (tab[j+2] == -1) && (tab[j+3] == -1) && (tab[j+4] == -1) && (tab[j+5] == -1) && (tab[j+6] == -1) && (tab[j+7] == -1) && (tab[j+8] == -1))
+                {
+                    tab[j]   = i;
+                    tab[j+1] = i;
+                    tab[j+2] = i;
+                    tab[j+3] = i;
+                    tab[j+4] = i;
+                    tab[j+5] = i;
+                    tab[j+6] = i;
+                    tab[j+7] = i;
+                    tab[j+8] = i;
+                    tab[taille_index[i][1]]   = -1;
+                    tab[taille_index[i][1]+1] = -1;
+                    tab[taille_index[i][1]+2] = -1;
+                    tab[taille_index[i][1]+3] = -1;
+                    tab[taille_index[i][1]+4] = -1;
+                    tab[taille_index[i][1]+5] = -1;
+                    tab[taille_index[i][1]+6] = -1;
+                    tab[taille_index[i][1]+7] = -1;
+                    tab[taille_index[i][1]+8] = -1;
+                    break;
+                }
+            }
+        }
+
+        i--;    //Index suivant
     }
+    while(i > 0);   //On fait défiler les index avec i
 
 
     fic2 = fopen("reponse2.txt", "w");
@@ -678,7 +676,7 @@ int main(int argc, char *argv[])
 
     for(i = 0 ; i<(sizeof(tab)/sizeof(int64_t)) ; i++)
     {
-        fprintf(fic2, "tab[%ld] = %ld\n", i, tab[i]);
+        fprintf(fic2, "tab[%lld] = %lld\n", i, tab[i]);
     }
     fclose(fic2);
     fic2 = NULL;
@@ -696,10 +694,7 @@ int main(int argc, char *argv[])
             //fprintf(fic1, "tab[%lld] = %lld * %lld, somme = %lld\n", i, tab[i], i, somme2);
         }
     }
-    printf("\nSomme2 = %ld\n", somme2);
-    //   630.727.996.320 too low
-    //34.749.607.868.319
-    //13.647.640.601.942 too high
+    printf("\nSomme2 = %lld\n", somme2);
 
     return 0;
 }
