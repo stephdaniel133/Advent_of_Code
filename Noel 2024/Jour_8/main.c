@@ -7,10 +7,10 @@
 #include <time.h>
 
 
-#define NBR_LINES   10
-#define NBR_COL     10
-//#define NBR_LINES   50
-//#define NBR_COL     50
+//#define NBR_LINES   12
+//#define NBR_COL     12
+#define NBR_LINES   50
+#define NBR_COL     50
 
 
 
@@ -37,7 +37,8 @@ int main(int argc, char *argv[])
     int antinode1Y = 0;
     int antinode2X = 0;
     int antinode2Y = 0;
-
+    int delta1X = 0;
+    int delta1Y = 0;
 
     memset(tab, '.', sizeof(tab));
     memset(tab2, 0, sizeof(tab2));
@@ -76,9 +77,7 @@ int main(int argc, char *argv[])
     printf("\n");*/
 
 
-
-    //On fait défiler les chiffres
-    for(frequency='0' ; frequency<='z' ; frequency++)
+    for(frequency='0' ; frequency<='z' ; frequency++)       //On fait défiler les frequences
     {
         if(frequency == ':') //On saute les caractères entre 9 et A dans la table ASCII
             frequency = 'A';
@@ -186,7 +185,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    printf("Somme1 = %ld\n\n", somme1);
+    printf("Somme1 = %lld\n\n", somme1);
     //182 too low
 
 
@@ -240,9 +239,7 @@ int main(int argc, char *argv[])
     printf("\n");*/
 
 
-
-    //On fait défiler les chiffres
-    for(frequency='0' ; frequency<='z' ; frequency++)
+    for(frequency='0' ; frequency<='z' ; frequency++)       //On fait défiler les frequences
     {
         if(frequency == ':') //On saute les caractères entre 9 et A dans la table ASCII
             frequency = 'A';
@@ -276,24 +273,43 @@ int main(int argc, char *argv[])
                                     antinode1Y = 2*antenna1Y - antenna2Y;
                                     antinode2X = 2*antenna2X - antenna1X;
                                     antinode2Y = 2*antenna2Y - antenna1Y;
+                                    delta1X = antenna1X - antenna2X;
+                                    delta1Y = antenna1Y - antenna2Y;
 
                                     if((antinode1X >= 0) && (antinode1X < NBR_LINES) && (antinode1Y >= 0) && (antinode1Y < NBR_COL) && (tab[antinode1X][antinode1Y] == '.'))
                                     {
-                                        tab[antinode1X][antinode1Y] = '#';
+                                        tab[antinode1X][antinode1Y] = '#';  //On place le premier antinode si possible
                                     }
+
+                                    do                                  //On place les suivants en ligne
+                                    {
+                                        antinode1X += delta1X;
+                                        antinode1Y += delta1Y;
+
+                                        if((antinode1X >= 0) && (antinode1X < NBR_LINES) && (antinode1Y >= 0) && (antinode1Y < NBR_COL) && (tab[antinode1X][antinode1Y] == '.'))
+                                        {
+                                            tab[antinode1X][antinode1Y] = '#';
+                                        }
+
+                                    }
+                                    while((antinode1X >= 0) && (antinode1X < NBR_LINES) && (antinode1Y >= 0) && (antinode1Y < NBR_COL));
+
                                     if((antinode2X >= 0) && (antinode2X < NBR_LINES) && (antinode2Y >= 0) && (antinode2Y < NBR_COL) && (tab[antinode2X][antinode2Y] == '.'))
                                     {
                                         tab[antinode2X][antinode2Y] = '#';
                                     }
 
-                                    if((antinode1X >= 0) && (antinode1X < NBR_LINES) && (antinode1Y >= 0) && (antinode1Y < NBR_COL))
+                                    do                                  //On place les suivants en ligne
                                     {
-                                        tab2[antinode1X][antinode1Y] = tab2[antinode1X][antinode1Y] + 1;
-                                    }
-                                    if((antinode2X >= 0) && (antinode2X < NBR_LINES) && (antinode2Y >= 0) && (antinode2Y < NBR_COL))
-                                    {
-                                        tab2[antinode2X][antinode2Y] = tab2[antinode2X][antinode2Y] + 1;
-                                    }
+                                        antinode2X -= delta1X;
+                                        antinode2Y -= delta1Y;
+
+                                        if((antinode2X >= 0) && (antinode2X < NBR_LINES) && (antinode2Y >= 0) && (antinode2Y < NBR_COL) && (tab[antinode2X][antinode2Y] == '.'))
+                                        {
+                                            tab[antinode2X][antinode2Y] = '#';
+                                        }
+
+                                    }while((antinode2X >= 0) && (antinode2X < NBR_LINES) && (antinode2Y >= 0) && (antinode2Y < NBR_COL));
                                 }
                             }
                         }
@@ -305,7 +321,7 @@ int main(int argc, char *argv[])
 
 
     //Impression du resultat complet
-    fic1 = fopen("reponse.txt", "w");
+    /*fic1 = fopen("reponse.txt", "w");
 
     if(fic1 != NULL)
     {
@@ -335,17 +351,18 @@ int main(int argc, char *argv[])
         printf("Impossible d'ouvrir le fichier reponse.txt\n");
     }
     fclose(fic1);
-    fic1 = NULL;
+    fic1 = NULL;*/
 
     //On ajoute toutes les solutions de chemins
     for(i=0 ; i<NBR_LINES ; i++)
     {
         for(j=0 ; j<NBR_COL ; j++)
         {
-            somme2 += tab2[i][j];
+            if(tab[i][j] != '.')
+                somme2++;
         }
     }
-    printf("Somme2 = %ld\n", somme2);
+    printf("Somme2 = %lld\n", somme2);
 
     return 0;
 }
