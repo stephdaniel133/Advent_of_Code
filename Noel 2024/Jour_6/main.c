@@ -27,8 +27,6 @@ int main(int argc, char *argv[])
     char tabOriginal[NBR_LINES][NBR_COL];
     int i = 0;
     int j = 0;
-    int k = 0;
-    int l = 0;
     int xcur = 0;
     int ycur = 0;
     int xcurOriginal = 0;
@@ -249,20 +247,15 @@ int main(int argc, char *argv[])
         {
             if(tabOriginal[i][j] != '#' && tabOriginal[i][j] != '^')
             {
-                /*if(!((i==xcurOriginal) && (j==ycurOriginal)))
-                {*/
-                    memcpy(tab, tabOriginal, sizeof(tab));    //On reprend la tableau original
-                    memset(tab2, 0, sizeof(tab2));
-                    tab[i][j] = '#';
-                /*}
-                else
-                    break;*/
+                memcpy(tab, tabOriginal, sizeof(tab));    //On reprend la tableau original
+                memset(tab2, 0, sizeof(tab2));
+                tab[i][j] = '#';
 
                 xcur = xcurOriginal;
                 ycur = ycurOriginal;
 
                 //On a créé un nouveau tableau, il faut tester si on a créé une boucle inifie
-                while(1)
+                while(boucle == false)
                 {
                     if(tab[xcur][ycur] == '^')
                     {
@@ -280,7 +273,11 @@ int main(int argc, char *argv[])
                         {
                             xcur--;
                             tab[xcur][ycur] = '^';
-                            tab2[xcur][ycur]++;
+
+                            if((tab2[xcur][ycur] & 0b0001) == 0)
+                                tab2[xcur][ycur] |= 0b0001;
+                            else
+                                boucle = true;
                         }
                     }
                     else if(tab[xcur][ycur] == '>')
@@ -299,7 +296,11 @@ int main(int argc, char *argv[])
                         {
                             ycur++;
                             tab[xcur][ycur] = '>';
-                            tab2[xcur][ycur]++;
+
+                            if((tab2[xcur][ycur] & 0b0010) == 0)
+                                tab2[xcur][ycur] |= 0b0010;
+                            else
+                                boucle = true;
                         }
                     }
                     else if(tab[xcur][ycur] == 'v')
@@ -318,7 +319,11 @@ int main(int argc, char *argv[])
                         {
                             xcur++;
                             tab[xcur][ycur] = 'v';
-                            tab2[xcur][ycur]++;
+
+                            if((tab2[xcur][ycur] & 0b0100) == 0)
+                                tab2[xcur][ycur] |= 0b0100;
+                            else
+                                boucle = true;
                         }
                     }
                     else if(tab[xcur][ycur] == '<')
@@ -337,31 +342,18 @@ int main(int argc, char *argv[])
                         {
                             ycur--;
                             tab[xcur][ycur] = '<';
-                            tab2[xcur][ycur]++;
-                        }
-                    }
 
-                    for(k=0 ; k<NBR_LINES && boucle == false ; k++)
-                    {
-                        for(l=0 ; l<NBR_COL  && boucle == false ; l++)
-                        {
-                            if(tab2[k][l] > 5)
-                            {
+                            if((tab2[xcur][ycur] & 0b1000) == 0)
+                                tab2[xcur][ycur] |= 0b1000;
+                            else
                                 boucle = true;
-                            }
                         }
                     }
-
-                    if(boucle == true)
-                    {
-                        printf("Boucle coordonnees x = %d, y = %d\n", i, j);
-                        break;
-                    }
-
                 }       //Fin while
 
                 if(boucle == true)
                 {
+                    printf("Boucle coordonnees x = %d, y = %d\n", i, j);
                     somme2++;
                     boucle = false;
                 }
