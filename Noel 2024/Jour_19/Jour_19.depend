@@ -1,0 +1,10 @@
+# depslib dependency file v1.0
+1734737456 source:/home/stephane/Arduino/Advent_of_Code/Noel 2024/Jour_19/main.c
+	<stdio.h>
+	<stdlib.h>
+	<stdint.h>
+	<stdbool.h>
+	<string.h>
+	<ctype.h>
+	<time.h>
+
