@@ -23,8 +23,7 @@ int main(int argc, char *argv[])
     char buf[NBR_COL+1];
     char tab[NBR_LINES][NBR_COL];
     char tab1[NBR_LINES][NBR_COL];
-    uint16_t tab2[NBR_LINES][NBR_COL];
-    char tabtemp[NBR_LINES][NBR_COL];
+    char tab2[NBR_LINES][NBR_COL];
     char tabOriginal[NBR_LINES][NBR_COL];
     int i = 0;
     int j = 0;
@@ -77,12 +76,14 @@ int main(int argc, char *argv[])
 
 
     //Detection du caractere de départ
-    for(i=0 ; i<NBR_LINES ; i++)
+    boucle = true;
+    for(i=0 ; (i<NBR_LINES) && (boucle == true) ; i++)
     {
-        for(j=0 ; j<NBR_COL ; j++)
+        for(j=0 ; (j<NBR_COL)  && (boucle == true) ; j++)
         {
             if(tab[i][j] == '^')
             {
+                boucle = false;
                 xcur = i;
                 ycur = j;
                 tab1[xcur][ycur] = '1';
@@ -222,15 +223,16 @@ int main(int argc, char *argv[])
     fic = NULL;
 
     //Detection du caractere de départ
-    for(i=0 ; i<NBR_LINES ; i++)
+    boucle = true;
+    for(i=0 ; (i<NBR_LINES) && (boucle == true) ; i++)
     {
-        for(j=0 ; j<NBR_COL ; j++)
+        for(j=0 ; (j<NBR_COL) && (boucle == true) ; j++)
         {
             if(tab[i][j] == '^')
             {
+                boucle = false;
                 xcur = i;
                 ycur = j;
-                tab1[xcur][ycur] = '1';
             }
         }
     }
@@ -245,18 +247,19 @@ int main(int argc, char *argv[])
     {
         for(j=0 ; j<NBR_COL ; j++)
         {
-            memcpy(tab, tabOriginal, NBR_LINES*NBR_COL);    //On reprend la tableau original
-            memset(tab2, 0, sizeof(tab2));
-
-            if(tab[i][j] != '#')
+            if(tabOriginal[i][j] != '#' && tabOriginal[i][j] != '^')
             {
-                //On prend le temps
-                if(!((i==xcurOriginal) && (j==ycurOriginal)))
+                /*if(!((i==xcurOriginal) && (j==ycurOriginal)))
+                {*/
+                    memcpy(tab, tabOriginal, sizeof(tab));    //On reprend la tableau original
+                    memset(tab2, 0, sizeof(tab2));
                     tab[i][j] = '#';
+                /*}
+                else
+                    break;*/
+
                 xcur = xcurOriginal;
                 ycur = ycurOriginal;
-
-                memcpy(tabtemp, tab, sizeof(tab));
 
                 //On a créé un nouveau tableau, il faut tester si on a créé une boucle inifie
                 while(1)
@@ -338,22 +341,11 @@ int main(int argc, char *argv[])
                         }
                     }
 
-                    if(memcmp(tab, tabtemp, sizeof(tab)) == 0)
+                    for(k=0 ; k<NBR_LINES && boucle == false ; k++)
                     {
-                        boucle = true;
-                        printf("Boucle coordonnees x = %d, y = %d\n", i, j);
-                        break;
-                    }
-                    else
-                    {
-                        memcpy(tabtemp, tab, sizeof(tab));
-                    }
-
-                    for(k=0 ; k<NBR_LINES ; k++)
-                    {
-                        for(l=0 ; l<NBR_COL ; l++)
+                        for(l=0 ; l<NBR_COL  && boucle == false ; l++)
                         {
-                            if(tab2[k][l] > 1000)
+                            if(tab2[k][l] > 5)
                             {
                                 boucle = true;
                             }
