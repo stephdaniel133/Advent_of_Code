@@ -188,7 +188,7 @@ int main(int argc, char *argv[])
             somme1++;
         }
     }
-    printf("\nSomme1 = %ld\n\n", somme1);
+    printf("\nSomme1 = %lld\n\n", somme1);
 
 
 
