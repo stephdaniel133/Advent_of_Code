@@ -3,80 +3,32 @@
 #include <string.h>
 #include <ctype.h>
 
-//Fonction qui teste une ligne unique
-int isSafe(int tab[2000][10], int ligne)
-{
-    int i = 0;
-    int isSafe = 0; // = 1 when safe
-
-
-    //On teste les conditions increase
-    if((tab[ligne][1] > tab[ligne][0]) && (tab[ligne][1] <= tab[ligne][0]+3))
-    {
-        i = 2;
-
-        while(tab[ligne][i] != -1)
-        {
-            if((tab[ligne][i] > tab[ligne][i-1]) && (tab[ligne][i] <= tab[ligne][i-1]+3))
-            {
-                isSafe = 1;
-                i++;
-            }
-            else
-            {
-                isSafe = 0;
-                break;
-            }
-        }
-    }
-    //On teste les conditions decrease
-    else if((tab[ligne][0] > tab[ligne][1]) && (tab[ligne][0] <= tab[ligne][1]+3))
-    {
-        i = 2;
-
-        while(tab[ligne][i] != -1)
-        {
-            if((tab[ligne][i-1] > tab[ligne][i]) && (tab[ligne][i-1] <= tab[ligne][i]+3))
-            {
-                isSafe = 1;
-                i++;
-            }
-            else
-            {
-                isSafe = 0;
-                break;
-            }
-        }
-    }
-    else
-    {
-        isSafe = 0;  //Les 2 valeurs sont égales, la condition n'est pas respectée, on sort de la fonction
-    }
-
-    return isSafe;
-}
-
-
-
-
-
 int main(int argc, char *argv[])
 {
-    char buf[100];
-    int i = 0;
-    int nbrligne = 0;
-    int somme1 = 0;
-    int somme2 = 0;
-    int tab1[2000][10];
-    int tab2[2000][10];
-    int tabResult[2000];
+    char buf1[100];
+    char buf2[100];
+    int64_t i = 0;
+    int64_t j = 0;
+    int64_t k = 0;
+    int64_t nbrligne = 0;
+    int64_t somme1 = 0;
+    int64_t somme2 = 0;
+    int64_t tab1[2000];
+    int64_t tab2[2000];
+    int64_t tab3[2000];
+    int64_t tab4[2000];
 
 
     FILE *fic = NULL;
 
     fic = fopen("data.txt", "r");
 
-    memset(tab1, -1, sizeof(tab1)); //Initialise à -1 parce qu'il n'y a pas de valeur négative dans les données
+    memset(buf1, 0, sizeof(buf1));
+    memset(buf2, 0, sizeof(buf2));
+    memset(tab1, 0, sizeof(tab1));
+    memset(tab2, 0, sizeof(tab2));
+    memset(tab3, 0, sizeof(tab3));
+    memset(tab4, 0, sizeof(tab4));
 
     i = sizeof("one");
 
@@ -86,7 +38,7 @@ int main(int argc, char *argv[])
 
         while(!feof(fic))
         {
-            fgets(buf, 100, fic);
+            //fgets(buf, 100, fic);
 
             if(feof(fic))
             {
@@ -94,8 +46,12 @@ int main(int argc, char *argv[])
             }
             else
             {
-                sscanf(buf, "%d %d %d %d %d %d %d %d", &tab1[nbrligne][0], &tab1[nbrligne][1], &tab1[nbrligne][2], &tab1[nbrligne][3], &tab1[nbrligne][4], &tab1[nbrligne][5], &tab1[nbrligne][6], &tab1[nbrligne][7]);
-                //printf("nbr1= %d, nbr2= %d\n", tab1[nbrligne], tab2[nbrligne]);
+                fscanf(fic, "%ld-%ld,", &tab1[nbrligne], &tab2[nbrligne]);
+                char temp1[100];
+                char temp2[100];
+                sprintf(temp1, "%ld", tab1[nbrligne]);
+                sprintf(temp2, "%ld", tab2[nbrligne]);
+                printf("nbr1= %ld, nbr2= %ld, taille1= %d, taille2= %d\n", tab1[nbrligne], tab2[nbrligne], (int)strlen(temp1), (int)strlen(temp2));
             }
 
             nbrligne++;
@@ -106,186 +62,243 @@ int main(int argc, char *argv[])
         printf("Impossible d'ouvrir le fichier data\n");
     }
 
+    printf("\n");
 
+    //On trie pour mettre les valeurs inférieure dans le tableau 1
     for(i=0 ; i<nbrligne ; i++)
     {
-        somme1 += isSafe(tab1, i);
-    }
-
-    printf("somme1 = %d\n", somme1);
-
-
-    //--------------Part 2-----------------
-    //On va retirer une à une les colonne du tableau et repasser l'algorithme de recherche des lignes SAFE
-
-    //On cherche les SAFE dans le tableau initial
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tabResult[i] += isSafe(tab1, i);
-    }
-
-    //Puis on cherche dans les tableaux tronqués d'une colonne et on additionne les SAFE supplémentaires
-
-    //On retire la colonne 0
-    memset(tab2, -1, sizeof(tab2));
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tab2[i][0] = tab1[i][1];
-        tab2[i][1] = tab1[i][2];
-        tab2[i][2] = tab1[i][3];
-        tab2[i][3] = tab1[i][4];
-        tab2[i][4] = tab1[i][5];
-        tab2[i][5] = tab1[i][6];
-        tab2[i][6] = tab1[i][7];
-    }
-
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tabResult[i] += isSafe(tab2, i);
-    }
-
-    //On retire la colonne 1
-    memset(tab2, -1, sizeof(tab2));
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tab2[i][0] = tab1[i][0];
-        tab2[i][1] = tab1[i][2];
-        tab2[i][2] = tab1[i][3];
-        tab2[i][3] = tab1[i][4];
-        tab2[i][4] = tab1[i][5];
-        tab2[i][5] = tab1[i][6];
-        tab2[i][6] = tab1[i][7];
-    }
-
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tabResult[i] += isSafe(tab2, i);
-    }
-
-    //On retire la colonne 2
-    memset(tab2, -1, sizeof(tab2));
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tab2[i][0] = tab1[i][0];
-        tab2[i][1] = tab1[i][1];
-        tab2[i][2] = tab1[i][3];
-        tab2[i][3] = tab1[i][4];
-        tab2[i][4] = tab1[i][5];
-        tab2[i][5] = tab1[i][6];
-        tab2[i][6] = tab1[i][7];
-    }
-
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tabResult[i] += isSafe(tab2, i);
-    }
-
-
-    //On retire la colonne 3
-    memset(tab2, -1, sizeof(tab2));
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tab2[i][0] = tab1[i][0];
-        tab2[i][1] = tab1[i][1];
-        tab2[i][2] = tab1[i][2];
-        tab2[i][3] = tab1[i][4];
-        tab2[i][4] = tab1[i][5];
-        tab2[i][5] = tab1[i][6];
-        tab2[i][6] = tab1[i][7];
-    }
-
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tabResult[i] += isSafe(tab2, i);
-    }
-
-
-    //On retire la colonne 4
-    memset(tab2, -1, sizeof(tab2));
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tab2[i][0] = tab1[i][0];
-        tab2[i][1] = tab1[i][1];
-        tab2[i][2] = tab1[i][2];
-        tab2[i][3] = tab1[i][3];
-        tab2[i][4] = tab1[i][5];
-        tab2[i][5] = tab1[i][6];
-        tab2[i][6] = tab1[i][7];
-    }
-
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tabResult[i] += isSafe(tab2, i);
-    }
-
-
-    //On retire la colonne 5
-    memset(tab2, -1, sizeof(tab2));
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tab2[i][0] = tab1[i][0];
-        tab2[i][1] = tab1[i][1];
-        tab2[i][2] = tab1[i][2];
-        tab2[i][3] = tab1[i][3];
-        tab2[i][4] = tab1[i][4];
-        tab2[i][5] = tab1[i][6];
-        tab2[i][6] = tab1[i][7];
-    }
-
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tabResult[i] += isSafe(tab2, i);
-    }
-
-
-    //On retire la colonne 6
-    memset(tab2, -1, sizeof(tab2));
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tab2[i][0] = tab1[i][0];
-        tab2[i][1] = tab1[i][1];
-        tab2[i][2] = tab1[i][2];
-        tab2[i][3] = tab1[i][3];
-        tab2[i][4] = tab1[i][4];
-        tab2[i][5] = tab1[i][5];
-        tab2[i][6] = tab1[i][7];
-    }
-
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tabResult[i] += isSafe(tab2, i);
-    }
-
-
-    //On retire la colonne 7
-    memset(tab2, -1, sizeof(tab2));
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tab2[i][0] = tab1[i][0];
-        tab2[i][1] = tab1[i][1];
-        tab2[i][2] = tab1[i][2];
-        tab2[i][3] = tab1[i][3];
-        tab2[i][4] = tab1[i][4];
-        tab2[i][5] = tab1[i][5];
-        tab2[i][6] = tab1[i][6];
-    }
-
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        tabResult[i] += isSafe(tab2, i);
-    }
-
-
-    //On termine par ocmpter le nombre de lignes bonnes
-    for(i=0 ; i<1000 ; i++)
-    {
-        if(tabResult[i] > 0)
+        if(tab1[i] > tab2[i])
         {
-            somme2 += 1;
+            int temp = tab1[i];
+            tab1[i] = tab2[i];
+            tab2[i] = temp;
+            printf("Change\n");
+        }
+        printf("nbr1= %ld, nbr2= %ld\n", tab1[i], tab2[i]);
+    }
+
+    //On cherche les invalids ID
+    for(i=0 ; i<nbrligne ; i++)
+    {
+        for(j=tab1[i] ; j<tab2[i]+1 ; j++)  //On fait défiler tous le range entre les 2 nombres
+        {
+            sprintf(buf1, "%ld", j);
+
+            //printf("chaine1: %s\n", buf1);
+            //printf("chaine2: %s\n", buf1+strlen(buf1)/2);
+
+            if(0 == strncmp(buf1, buf1+strlen(buf1)/2, strlen(buf1)/2) && (0 == strlen(buf1)%2))
+            {
+                printf("Invalid ID: %ld\n", j);
+                tab3[k++] = j;
+            }
         }
     }
 
-    printf("somme2 = %d\n", somme2);
+    for(i=0 ; i<k ; i++)
+    {
+        somme1 += tab3[i];
+    }
+
+    printf("somme1 = %ld\n\n\n", somme1);
+
+
+    //--------------Part 2-----------------
+    //On cherche les invalids ID
+    k = 0;
+
+    for(i=0 ; i<nbrligne ; i++)
+    {
+        for(j=tab1[i] ; j<tab2[i]+1 ; j++)  //On fait défiler tous le range entre les 2 nombres
+        {
+            sprintf(buf1, "%ld", j);
+
+            //Detection d'une sequence double
+            //printf("chaine1: %s\n", buf1);
+            //printf("chaine2: %s\n", buf1+strlen(buf1)/2);
+            if((strlen(buf1) >= 2) &&
+               (0 == strncmp(buf1, buf1+strlen(buf1)/2, strlen(buf1)/2)) &&
+               (0 == strlen(buf1)%2))
+            {
+                printf("Invalid ID: %ld\n", j);
+                tab4[k++] = j;
+                //break;
+            }
+
+            //Detection d'une sequence triple
+            //printf("chaine1: %s\n", buf1);
+            //printf("chaine2: %s\n", buf1+strlen(buf1)/3);
+            //printf("chaine2: %s\n", buf1+2*strlen(buf1)/3);
+            if((strlen(buf1) >= 3) &&
+               (0 == strncmp(buf1, buf1+strlen(buf1)/3, strlen(buf1)/3)) &&
+               (0 == strncmp(buf1, buf1+2*strlen(buf1)/3, strlen(buf1)/3)) &&
+               (0 == strlen(buf1)%3))
+            {
+                printf("Invalid ID: %ld\n", j);
+                tab4[k++] = j;
+                //break;
+            }
+
+            //Detection d'une sequence quadruple
+            //printf("chaine1: %s\n", buf1);
+            //printf("chaine2: %s\n", buf1+strlen(buf1)/4);
+            //printf("chaine2: %s\n", buf1+2*strlen(buf1)/4);
+            //printf("chaine2: %s\n", buf1+3*strlen(buf1)/4);
+            if((strlen(buf1) >= 4) &&
+               (0 == strncmp(buf1, buf1+strlen(buf1)/4, strlen(buf1)/4)) &&
+               (0 == strncmp(buf1, buf1+2*strlen(buf1)/4, strlen(buf1)/4)) &&
+               (0 == strncmp(buf1, buf1+3*strlen(buf1)/4, strlen(buf1)/4)) &&
+               (0 == strlen(buf1)%4))
+            {
+                printf("Invalid ID: %ld\n", j);
+                tab4[k++] = j;
+                //break;
+            }
+
+            //Detection d'une sequence cinq
+            //printf("chaine1: %s\n", buf1);
+            //printf("chaine2: %s\n", buf1+strlen(buf1)/5);
+            //printf("chaine2: %s\n", buf1+2*strlen(buf1)/5);
+            //printf("chaine2: %s\n", buf1+3*strlen(buf1)/5);
+            //printf("chaine2: %s\n", buf1+4*strlen(buf1)/5);
+            if((strlen(buf1) >= 5) &&
+               (0 == strncmp(buf1, buf1+strlen(buf1)/5, strlen(buf1)/5)) &&
+               (0 == strncmp(buf1, buf1+2*strlen(buf1)/5, strlen(buf1)/5)) &&
+               (0 == strncmp(buf1, buf1+3*strlen(buf1)/5, strlen(buf1)/5)) &&
+               (0 == strncmp(buf1, buf1+4*strlen(buf1)/5, strlen(buf1)/5)) &&
+               (0 == strlen(buf1)%5))
+            {
+                printf("Invalid ID: %ld\n", j);
+                tab4[k++] = j;
+                //break;
+            }
+
+            //Detection d'une sequence six
+            //printf("chaine1: %s\n", buf1);
+            //printf("chaine2: %s\n", buf1+strlen(buf1)/5);
+            //printf("chaine2: %s\n", buf1+2*strlen(buf1)/5);
+            //printf("chaine2: %s\n", buf1+3*strlen(buf1)/5);
+            //printf("chaine2: %s\n", buf1+4*strlen(buf1)/5);
+            if((strlen(buf1) >= 6) &&
+               (0 == strncmp(buf1, buf1+strlen(buf1)/6, strlen(buf1)/6)) &&
+               (0 == strncmp(buf1, buf1+2*strlen(buf1)/6, strlen(buf1)/6)) &&
+               (0 == strncmp(buf1, buf1+3*strlen(buf1)/6, strlen(buf1)/6)) &&
+               (0 == strncmp(buf1, buf1+4*strlen(buf1)/6, strlen(buf1)/6)) &&
+               (0 == strncmp(buf1, buf1+5*strlen(buf1)/6, strlen(buf1)/6)) &&
+               (0 == strlen(buf1)%6))
+            {
+                printf("Invalid ID: %ld\n", j);
+                tab4[k++] = j;
+                //break;
+            }
+
+            //Detection d'une sequence sept
+            //printf("chaine1: %s\n", buf1);
+            //printf("chaine2: %s\n", buf1+strlen(buf1)/5);
+            //printf("chaine2: %s\n", buf1+2*strlen(buf1)/5);
+            //printf("chaine2: %s\n", buf1+3*strlen(buf1)/5);
+            //printf("chaine2: %s\n", buf1+4*strlen(buf1)/5);
+            if((strlen(buf1) >= 7) &&
+               (0 == strncmp(buf1, buf1+strlen(buf1)/7, strlen(buf1)/7)) &&
+               (0 == strncmp(buf1, buf1+2*strlen(buf1)/7, strlen(buf1)/7)) &&
+               (0 == strncmp(buf1, buf1+3*strlen(buf1)/7, strlen(buf1)/7)) &&
+               (0 == strncmp(buf1, buf1+4*strlen(buf1)/7, strlen(buf1)/7)) &&
+               (0 == strncmp(buf1, buf1+5*strlen(buf1)/7, strlen(buf1)/7)) &&
+               (0 == strncmp(buf1, buf1+6*strlen(buf1)/7, strlen(buf1)/7)) &&
+               (0 == strlen(buf1)%7))
+            {
+                printf("Invalid ID: %ld\n", j);
+                tab4[k++] = j;
+                //break;
+            }
+
+            //Detection d'une sequence huit
+            //printf("chaine1: %s\n", buf1);
+            //printf("chaine2: %s\n", buf1+strlen(buf1)/5);
+            //printf("chaine2: %s\n", buf1+2*strlen(buf1)/5);
+            //printf("chaine2: %s\n", buf1+3*strlen(buf1)/5);
+            //printf("chaine2: %s\n", buf1+4*strlen(buf1)/5);
+            if((strlen(buf1) >= 8) &&
+               (0 == strncmp(buf1, buf1+strlen(buf1)/8, strlen(buf1)/8)) &&
+               (0 == strncmp(buf1, buf1+2*strlen(buf1)/8, strlen(buf1)/8)) &&
+               (0 == strncmp(buf1, buf1+3*strlen(buf1)/8, strlen(buf1)/8)) &&
+               (0 == strncmp(buf1, buf1+4*strlen(buf1)/8, strlen(buf1)/8)) &&
+               (0 == strncmp(buf1, buf1+5*strlen(buf1)/8, strlen(buf1)/8)) &&
+               (0 == strncmp(buf1, buf1+6*strlen(buf1)/8, strlen(buf1)/8)) &&
+               (0 == strncmp(buf1, buf1+7*strlen(buf1)/8, strlen(buf1)/8)) &&
+               (0 == strlen(buf1)%8))
+            {
+                printf("Invalid ID: %ld\n", j);
+                tab4[k++] = j;
+                //break;
+            }
+
+            //Detection d'une sequence neuf
+            //printf("chaine1: %s\n", buf1);
+            //printf("chaine2: %s\n", buf1+strlen(buf1)/5);
+            //printf("chaine2: %s\n", buf1+2*strlen(buf1)/5);
+            //printf("chaine2: %s\n", buf1+3*strlen(buf1)/5);
+            //printf("chaine2: %s\n", buf1+4*strlen(buf1)/5);
+            if((strlen(buf1) >= 9) &&
+               (0 == strncmp(buf1, buf1+strlen(buf1)/9, strlen(buf1)/9)) &&
+               (0 == strncmp(buf1, buf1+2*strlen(buf1)/9, strlen(buf1)/9)) &&
+               (0 == strncmp(buf1, buf1+3*strlen(buf1)/9, strlen(buf1)/9)) &&
+               (0 == strncmp(buf1, buf1+4*strlen(buf1)/9, strlen(buf1)/9)) &&
+               (0 == strncmp(buf1, buf1+5*strlen(buf1)/9, strlen(buf1)/9)) &&
+               (0 == strncmp(buf1, buf1+6*strlen(buf1)/9, strlen(buf1)/9)) &&
+               (0 == strncmp(buf1, buf1+7*strlen(buf1)/9, strlen(buf1)/9)) &&
+               (0 == strncmp(buf1, buf1+8*strlen(buf1)/9, strlen(buf1)/9)) &&
+               (0 == strlen(buf1)%9))
+            {
+                printf("Invalid ID: %ld\n", j);
+                tab4[k++] = j;
+                //break;
+            }
+
+            //Detection d'une sequence dix
+            //printf("chaine1: %s\n", buf1);
+            //printf("chaine2: %s\n", buf1+strlen(buf1)/5);
+            //printf("chaine2: %s\n", buf1+2*strlen(buf1)/5);
+            //printf("chaine2: %s\n", buf1+3*strlen(buf1)/5);
+            //printf("chaine2: %s\n", buf1+4*strlen(buf1)/5);
+            if((strlen(buf1) >= 10) &&
+               (0 == strncmp(buf1, buf1+strlen(buf1)/10, strlen(buf1)/10)) &&
+               (0 == strncmp(buf1, buf1+2*strlen(buf1)/10, strlen(buf1)/10)) &&
+               (0 == strncmp(buf1, buf1+3*strlen(buf1)/10, strlen(buf1)/10)) &&
+               (0 == strncmp(buf1, buf1+4*strlen(buf1)/10, strlen(buf1)/10)) &&
+               (0 == strncmp(buf1, buf1+5*strlen(buf1)/10, strlen(buf1)/10)) &&
+               (0 == strncmp(buf1, buf1+6*strlen(buf1)/10, strlen(buf1)/10)) &&
+               (0 == strncmp(buf1, buf1+7*strlen(buf1)/10, strlen(buf1)/10)) &&
+               (0 == strncmp(buf1, buf1+8*strlen(buf1)/10, strlen(buf1)/10)) &&
+               (0 == strncmp(buf1, buf1+9*strlen(buf1)/10, strlen(buf1)/10)) &&
+               (0 == strlen(buf1)%10))
+            {
+                printf("Invalid ID: %ld\n", j);
+                tab4[k++] = j;
+                //break;
+            }
+        }
+    }
+
+    //On élimine les ID en apparaissant plusieurs fois
+    for(i=0 ; i<k ; i++)
+    {
+        for(j=i+1 ; j<k ; j++)
+        {
+            if(tab4[i] == tab4[j])
+            {
+                tab4[j] = 0;
+            }
+        }
+    }
+
+    for(i=0 ; i<k ; i++)
+    {
+        somme2 += tab4[i];
+    }
+
+    printf("somme2 = %ld\n", somme2);
+
 
     fclose(fic);
     fic = NULL;
