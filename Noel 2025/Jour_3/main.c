@@ -14,11 +14,9 @@ int main(int argc, char *argv[])
     int64_t nbrligne = 0;
     int64_t somme1 = 0;
     int64_t somme2 = 0;
-    uint8_t nbrCaraRestant = 0;
     char tab1[210][2];
     char tab2[210][2];
-    char tab3[210][110];    //Tableau refletant les caracteres que l'on conserve
-    int64_t tab4[210];
+    int64_t tab3[210];
 
 
     FILE *fic = NULL;
@@ -29,8 +27,7 @@ int main(int argc, char *argv[])
     memset(buf2, 0, sizeof(buf2));
     memset(tab1, 0, sizeof(tab1));
     memset(tab2, 0, sizeof(tab2));
-    memset(tab3, 1, sizeof(tab3));
-    //memset(tab4, 0, sizeof(tab4));
+    memset(tab3, 0, sizeof(tab3));
 
     i = sizeof("one");
 
@@ -48,8 +45,7 @@ int main(int argc, char *argv[])
             }
             else
             {
-                fscanf(fic, "%s", &buf1[nbrligne]);
-                //printf("nbr1= %ld, nbr2= %ld, taille1= %d, taille2= %d\n", tab1[nbrligne], tab2[nbrligne], (int)strlen(temp1), (int)strlen(temp2));
+                fscanf(fic, "%s", buf1[nbrligne]);
             }
 
             nbrligne++;
@@ -63,7 +59,6 @@ int main(int argc, char *argv[])
     printf("\n");
 
     //--------------Part 1-----------------
-    //On cherche les invalids ID
     for(i=0 ; i<nbrligne ; i++)
     {
         //Recherche du premier caractères le plus grand
@@ -120,23 +115,23 @@ int main(int argc, char *argv[])
             }
 
             len--;
-            buf1[i][len] = '\0';
+            buf1[i][len] = '\0'; //On met une nouvelle fin de ligne
             remove--;
         }
     }
 
-    //On rtransforme l'ASCII en nombre
+    //On transforme l'ASCII en nombre
     for(i=0 ; i<nbrligne ; i++)
     {
         for(j=0 ; j<strlen(buf1[i]) ; j++)
         {
-            tab4[i] = 10 * tab4[i] + buf1[i][j] - 0x30; //Transformation des ASCII en nombre
+            tab3[i] = 10 * tab3[i] + buf1[i][j] - 0x30;
         }
     }
 
     for(i=0 ; i<nbrligne ; i++)
     {
-        somme2 += tab4[i];
+        somme2 += tab3[i];
     }
 
     printf("somme2 = %ld\n", somme2);
