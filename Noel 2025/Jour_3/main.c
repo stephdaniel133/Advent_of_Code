@@ -2,10 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdint.h>
 
 int main(int argc, char *argv[])
 {
-    char buf1[100];
+    char buf1[210][110];
     char buf2[100];
     int64_t i = 0;
     int64_t j = 0;
@@ -13,10 +14,11 @@ int main(int argc, char *argv[])
     int64_t nbrligne = 0;
     int64_t somme1 = 0;
     int64_t somme2 = 0;
-    int64_t tab1[2000];
-    int64_t tab2[2000];
-    int64_t tab3[2000];
-    int64_t tab4[2000];
+    uint8_t nbrCaraRestant = 0;
+    char tab1[210][2];
+    char tab2[210][2];
+    char tab3[210][110];    //Tableau refletant les caracteres que l'on conserve
+    int64_t tab4[210];
 
 
     FILE *fic = NULL;
@@ -27,8 +29,8 @@ int main(int argc, char *argv[])
     memset(buf2, 0, sizeof(buf2));
     memset(tab1, 0, sizeof(tab1));
     memset(tab2, 0, sizeof(tab2));
-    memset(tab3, 0, sizeof(tab3));
-    memset(tab4, 0, sizeof(tab4));
+    memset(tab3, 1, sizeof(tab3));
+    //memset(tab4, 0, sizeof(tab4));
 
     i = sizeof("one");
 
@@ -46,12 +48,8 @@ int main(int argc, char *argv[])
             }
             else
             {
-                fscanf(fic, "%ld-%ld,", &tab1[nbrligne], &tab2[nbrligne]);
-                char temp1[100];
-                char temp2[100];
-                sprintf(temp1, "%ld", tab1[nbrligne]);
-                sprintf(temp2, "%ld", tab2[nbrligne]);
-                printf("nbr1= %ld, nbr2= %ld, taille1= %d, taille2= %d\n", tab1[nbrligne], tab2[nbrligne], (int)strlen(temp1), (int)strlen(temp2));
+                fscanf(fic, "%s", &buf1[nbrligne]);
+                //printf("nbr1= %ld, nbr2= %ld, taille1= %d, taille2= %d\n", tab1[nbrligne], tab2[nbrligne], (int)strlen(temp1), (int)strlen(temp2));
             }
 
             nbrligne++;
@@ -64,235 +62,79 @@ int main(int argc, char *argv[])
 
     printf("\n");
 
-    //On trie pour mettre les valeurs inférieure dans le tableau 1
-    for(i=0 ; i<nbrligne ; i++)
-    {
-        if(tab1[i] > tab2[i])
-        {
-            int temp = tab1[i];
-            tab1[i] = tab2[i];
-            tab2[i] = temp;
-            printf("Change\n");
-        }
-        printf("nbr1= %ld, nbr2= %ld\n", tab1[i], tab2[i]);
-    }
-
+    //--------------Part 1-----------------
     //On cherche les invalids ID
     for(i=0 ; i<nbrligne ; i++)
     {
-        for(j=tab1[i] ; j<tab2[i]+1 ; j++)  //On fait défiler tous le range entre les 2 nombres
+        //Recherche du premier caractères le plus grand
+        for(j=0 ; j<strlen(buf1[i])-1 ; j++)
         {
-            sprintf(buf1, "%ld", j);
-
-            //printf("chaine1: %s\n", buf1);
-            //printf("chaine2: %s\n", buf1+strlen(buf1)/2);
-
-            if(0 == strncmp(buf1, buf1+strlen(buf1)/2, strlen(buf1)/2) && (0 == strlen(buf1)%2))
+            if(tab1[i][0] < buf1[i][j])
             {
-                printf("Invalid ID: %ld\n", j);
-                tab3[k++] = j;
+                tab1[i][0] = buf1[i][j];
+                tab1[i][1] = j;
+            }
+        }
+
+        //Recherche du second caractères le plus grand
+        for(j=tab1[i][1]+1 ; j<strlen(buf1[i]) ; j++)
+        {
+            if(tab2[i][0] < buf1[i][j])
+            {
+                tab2[i][0] = buf1[i][j];
+                tab2[i][1] = j;
             }
         }
     }
 
-    for(i=0 ; i<k ; i++)
+    for(i=0 ; i<nbrligne ; i++)
     {
-        somme1 += tab3[i];
+        somme1 += (tab1[i][0]-0x30) * 10 + (tab2[i][0] - 0x30);
     }
 
     printf("somme1 = %ld\n\n\n", somme1);
 
 
     //--------------Part 2-----------------
-    //On cherche les invalids ID
-    k = 0;
-
     for(i=0 ; i<nbrligne ; i++)
     {
-        for(j=tab1[i] ; j<tab2[i]+1 ; j++)  //On fait défiler tous le range entre les 2 nombres
+        int len = strlen(buf1[i]);
+        int remove = len - 12; //On veut garder 12 caractères
+
+        //On élimine un chiffre si le suivant est plus grand de gauche à droite
+        //ou on retire le dernier si on n'en trouve pas
+        while(remove > 0)
         {
-            sprintf(buf1, "%ld", j);
-
-            //Detection d'une sequence double
-            //printf("chaine1: %s\n", buf1);
-            //printf("chaine2: %s\n", buf1+strlen(buf1)/2);
-            if((strlen(buf1) >= 2) &&
-               (0 == strncmp(buf1, buf1+strlen(buf1)/2, strlen(buf1)/2)) &&
-               (0 == strlen(buf1)%2))
+            for(j=0 ; j<len-1 ; j++)
             {
-                printf("Invalid ID: %ld\n", j);
-                tab4[k++] = j;
-                //break;
+                if(buf1[i][j] < buf1[i][j+1])
+                {
+                    break;
+                }
             }
 
-            //Detection d'une sequence triple
-            //printf("chaine1: %s\n", buf1);
-            //printf("chaine2: %s\n", buf1+strlen(buf1)/3);
-            //printf("chaine2: %s\n", buf1+2*strlen(buf1)/3);
-            if((strlen(buf1) >= 3) &&
-               (0 == strncmp(buf1, buf1+strlen(buf1)/3, strlen(buf1)/3)) &&
-               (0 == strncmp(buf1, buf1+2*strlen(buf1)/3, strlen(buf1)/3)) &&
-               (0 == strlen(buf1)%3))
+            //On supprimer le chiffre plus petit trouvé en decalant à gauche la suite du nombre
+            for(k = j ; k<len-1 ; k++)
             {
-                printf("Invalid ID: %ld\n", j);
-                tab4[k++] = j;
-                //break;
+                buf1[i][k] = buf1[i][k+1];
             }
 
-            //Detection d'une sequence quadruple
-            //printf("chaine1: %s\n", buf1);
-            //printf("chaine2: %s\n", buf1+strlen(buf1)/4);
-            //printf("chaine2: %s\n", buf1+2*strlen(buf1)/4);
-            //printf("chaine2: %s\n", buf1+3*strlen(buf1)/4);
-            if((strlen(buf1) >= 4) &&
-               (0 == strncmp(buf1, buf1+strlen(buf1)/4, strlen(buf1)/4)) &&
-               (0 == strncmp(buf1, buf1+2*strlen(buf1)/4, strlen(buf1)/4)) &&
-               (0 == strncmp(buf1, buf1+3*strlen(buf1)/4, strlen(buf1)/4)) &&
-               (0 == strlen(buf1)%4))
-            {
-                printf("Invalid ID: %ld\n", j);
-                tab4[k++] = j;
-                //break;
-            }
-
-            //Detection d'une sequence cinq
-            //printf("chaine1: %s\n", buf1);
-            //printf("chaine2: %s\n", buf1+strlen(buf1)/5);
-            //printf("chaine2: %s\n", buf1+2*strlen(buf1)/5);
-            //printf("chaine2: %s\n", buf1+3*strlen(buf1)/5);
-            //printf("chaine2: %s\n", buf1+4*strlen(buf1)/5);
-            if((strlen(buf1) >= 5) &&
-               (0 == strncmp(buf1, buf1+strlen(buf1)/5, strlen(buf1)/5)) &&
-               (0 == strncmp(buf1, buf1+2*strlen(buf1)/5, strlen(buf1)/5)) &&
-               (0 == strncmp(buf1, buf1+3*strlen(buf1)/5, strlen(buf1)/5)) &&
-               (0 == strncmp(buf1, buf1+4*strlen(buf1)/5, strlen(buf1)/5)) &&
-               (0 == strlen(buf1)%5))
-            {
-                printf("Invalid ID: %ld\n", j);
-                tab4[k++] = j;
-                //break;
-            }
-
-            //Detection d'une sequence six
-            //printf("chaine1: %s\n", buf1);
-            //printf("chaine2: %s\n", buf1+strlen(buf1)/5);
-            //printf("chaine2: %s\n", buf1+2*strlen(buf1)/5);
-            //printf("chaine2: %s\n", buf1+3*strlen(buf1)/5);
-            //printf("chaine2: %s\n", buf1+4*strlen(buf1)/5);
-            if((strlen(buf1) >= 6) &&
-               (0 == strncmp(buf1, buf1+strlen(buf1)/6, strlen(buf1)/6)) &&
-               (0 == strncmp(buf1, buf1+2*strlen(buf1)/6, strlen(buf1)/6)) &&
-               (0 == strncmp(buf1, buf1+3*strlen(buf1)/6, strlen(buf1)/6)) &&
-               (0 == strncmp(buf1, buf1+4*strlen(buf1)/6, strlen(buf1)/6)) &&
-               (0 == strncmp(buf1, buf1+5*strlen(buf1)/6, strlen(buf1)/6)) &&
-               (0 == strlen(buf1)%6))
-            {
-                printf("Invalid ID: %ld\n", j);
-                tab4[k++] = j;
-                //break;
-            }
-
-            //Detection d'une sequence sept
-            //printf("chaine1: %s\n", buf1);
-            //printf("chaine2: %s\n", buf1+strlen(buf1)/5);
-            //printf("chaine2: %s\n", buf1+2*strlen(buf1)/5);
-            //printf("chaine2: %s\n", buf1+3*strlen(buf1)/5);
-            //printf("chaine2: %s\n", buf1+4*strlen(buf1)/5);
-            if((strlen(buf1) >= 7) &&
-               (0 == strncmp(buf1, buf1+strlen(buf1)/7, strlen(buf1)/7)) &&
-               (0 == strncmp(buf1, buf1+2*strlen(buf1)/7, strlen(buf1)/7)) &&
-               (0 == strncmp(buf1, buf1+3*strlen(buf1)/7, strlen(buf1)/7)) &&
-               (0 == strncmp(buf1, buf1+4*strlen(buf1)/7, strlen(buf1)/7)) &&
-               (0 == strncmp(buf1, buf1+5*strlen(buf1)/7, strlen(buf1)/7)) &&
-               (0 == strncmp(buf1, buf1+6*strlen(buf1)/7, strlen(buf1)/7)) &&
-               (0 == strlen(buf1)%7))
-            {
-                printf("Invalid ID: %ld\n", j);
-                tab4[k++] = j;
-                //break;
-            }
-
-            //Detection d'une sequence huit
-            //printf("chaine1: %s\n", buf1);
-            //printf("chaine2: %s\n", buf1+strlen(buf1)/5);
-            //printf("chaine2: %s\n", buf1+2*strlen(buf1)/5);
-            //printf("chaine2: %s\n", buf1+3*strlen(buf1)/5);
-            //printf("chaine2: %s\n", buf1+4*strlen(buf1)/5);
-            if((strlen(buf1) >= 8) &&
-               (0 == strncmp(buf1, buf1+strlen(buf1)/8, strlen(buf1)/8)) &&
-               (0 == strncmp(buf1, buf1+2*strlen(buf1)/8, strlen(buf1)/8)) &&
-               (0 == strncmp(buf1, buf1+3*strlen(buf1)/8, strlen(buf1)/8)) &&
-               (0 == strncmp(buf1, buf1+4*strlen(buf1)/8, strlen(buf1)/8)) &&
-               (0 == strncmp(buf1, buf1+5*strlen(buf1)/8, strlen(buf1)/8)) &&
-               (0 == strncmp(buf1, buf1+6*strlen(buf1)/8, strlen(buf1)/8)) &&
-               (0 == strncmp(buf1, buf1+7*strlen(buf1)/8, strlen(buf1)/8)) &&
-               (0 == strlen(buf1)%8))
-            {
-                printf("Invalid ID: %ld\n", j);
-                tab4[k++] = j;
-                //break;
-            }
-
-            //Detection d'une sequence neuf
-            //printf("chaine1: %s\n", buf1);
-            //printf("chaine2: %s\n", buf1+strlen(buf1)/5);
-            //printf("chaine2: %s\n", buf1+2*strlen(buf1)/5);
-            //printf("chaine2: %s\n", buf1+3*strlen(buf1)/5);
-            //printf("chaine2: %s\n", buf1+4*strlen(buf1)/5);
-            if((strlen(buf1) >= 9) &&
-               (0 == strncmp(buf1, buf1+strlen(buf1)/9, strlen(buf1)/9)) &&
-               (0 == strncmp(buf1, buf1+2*strlen(buf1)/9, strlen(buf1)/9)) &&
-               (0 == strncmp(buf1, buf1+3*strlen(buf1)/9, strlen(buf1)/9)) &&
-               (0 == strncmp(buf1, buf1+4*strlen(buf1)/9, strlen(buf1)/9)) &&
-               (0 == strncmp(buf1, buf1+5*strlen(buf1)/9, strlen(buf1)/9)) &&
-               (0 == strncmp(buf1, buf1+6*strlen(buf1)/9, strlen(buf1)/9)) &&
-               (0 == strncmp(buf1, buf1+7*strlen(buf1)/9, strlen(buf1)/9)) &&
-               (0 == strncmp(buf1, buf1+8*strlen(buf1)/9, strlen(buf1)/9)) &&
-               (0 == strlen(buf1)%9))
-            {
-                printf("Invalid ID: %ld\n", j);
-                tab4[k++] = j;
-                //break;
-            }
-
-            //Detection d'une sequence dix
-            //printf("chaine1: %s\n", buf1);
-            //printf("chaine2: %s\n", buf1+strlen(buf1)/5);
-            //printf("chaine2: %s\n", buf1+2*strlen(buf1)/5);
-            //printf("chaine2: %s\n", buf1+3*strlen(buf1)/5);
-            //printf("chaine2: %s\n", buf1+4*strlen(buf1)/5);
-            if((strlen(buf1) >= 10) &&
-               (0 == strncmp(buf1, buf1+strlen(buf1)/10, strlen(buf1)/10)) &&
-               (0 == strncmp(buf1, buf1+2*strlen(buf1)/10, strlen(buf1)/10)) &&
-               (0 == strncmp(buf1, buf1+3*strlen(buf1)/10, strlen(buf1)/10)) &&
-               (0 == strncmp(buf1, buf1+4*strlen(buf1)/10, strlen(buf1)/10)) &&
-               (0 == strncmp(buf1, buf1+5*strlen(buf1)/10, strlen(buf1)/10)) &&
-               (0 == strncmp(buf1, buf1+6*strlen(buf1)/10, strlen(buf1)/10)) &&
-               (0 == strncmp(buf1, buf1+7*strlen(buf1)/10, strlen(buf1)/10)) &&
-               (0 == strncmp(buf1, buf1+8*strlen(buf1)/10, strlen(buf1)/10)) &&
-               (0 == strncmp(buf1, buf1+9*strlen(buf1)/10, strlen(buf1)/10)) &&
-               (0 == strlen(buf1)%10))
-            {
-                printf("Invalid ID: %ld\n", j);
-                tab4[k++] = j;
-                //break;
-            }
+            len--;
+            buf1[i][len] = '\0';
+            remove--;
         }
     }
 
-    //On élimine les ID en apparaissant plusieurs fois
-    for(i=0 ; i<k ; i++)
+    //On rtransforme l'ASCII en nombre
+    for(i=0 ; i<nbrligne ; i++)
     {
-        for(j=i+1 ; j<k ; j++)
+        for(j=0 ; j<strlen(buf1[i]) ; j++)
         {
-            if(tab4[i] == tab4[j])
-            {
-                tab4[j] = 0;
-            }
+            tab4[i] = 10 * tab4[i] + buf1[i][j] - 0x30; //Transformation des ASCII en nombre
         }
     }
 
-    for(i=0 ; i<k ; i++)
+    for(i=0 ; i<nbrligne ; i++)
     {
         somme2 += tab4[i];
     }
