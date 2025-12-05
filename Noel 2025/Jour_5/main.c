@@ -4,46 +4,53 @@
 #include <ctype.h>
 #include <stdint.h>
 
-//#define NBR_LINES   10
-//#define NBR_COL     10
-#define NBR_LINES   140
-#define NBR_COL     140
+#define NBR_RANGES   4
+#define NBR_INGR     6
+//#define NBR_RANGES   187
+//#define NBR_INGR     1000
 
 int main(int argc, char *argv[])
 {
-    char buf1[NBR_COL+2];
-    char buf2[NBR_COL+2];
-    int nbrRolls = 0;
-    int encore = 0;
+    //char buf1[NBR_COL+2];
+    //char buf2[NBR_COL+2];
     int64_t i = 0;
     int64_t j = 0;
     int64_t somme1 = 0;
     int64_t somme2 = 0;
-    char tab1[NBR_LINES+2][NBR_COL+2];
-    char tab2[NBR_LINES+2][NBR_COL+2];
-    char tab3[NBR_LINES+2][NBR_COL+2];
+    int64_t tab1[NBR_RANGES][2];
+    int64_t tab2[NBR_INGR][2];
+    int64_t tab3[NBR_RANGES][2];
+    int64_t tab4[NBR_RANGES];
+    int newRange = 0;
+    int nbrRange = 0;
+    int encore = 0;
 
 
     FILE *fic = NULL;
 
     fic = fopen("data.txt", "r");
 
-    memset(buf1, 0, sizeof(buf1));
-    memset(buf2, 0, sizeof(buf2));
-    memset(tab1, '1', sizeof(tab1));
-    memset(tab2, '1', sizeof(tab2));
-    memset(tab3, '1', sizeof(tab3));
+    memset(tab1, 0, sizeof(tab1));
+    memset(tab2, 0, sizeof(tab2));
+    memset(tab3, 0, sizeof(tab3));
 
 
     if(fic != NULL)
     {
         printf("fichier ouvert\n");
 
-        for(i=1 ; i<NBR_LINES+1 ; i++)
+        //On récupère les ranges
+        for(i=0 ; i<NBR_RANGES ; i++)
         {
-            fgets(buf1, NBR_COL+1, fic);
-            memcpy(tab1[i]+1, buf1, NBR_COL);
-            fgetc(fic); //On echappe le saut à la ligne
+            fscanf(fic, "%ld-%ld", &tab1[i][0], &tab1[i][1]);
+        }
+
+        //On passe le saut de ligne
+        fgetc(fic);
+
+        for(i=0 ; i<NBR_INGR ; i++)
+        {
+            fscanf(fic, "%ld", &tab2[i][0]);
         }
     }
     else
@@ -54,137 +61,144 @@ int main(int argc, char *argv[])
     printf("\n");
 
 
-    //Impression du puzzle complet
-    for(i=0 ; i<NBR_LINES+2 ; i++)
-    {
-        for(j=0 ; j<NBR_COL+2 ; j++)
-        {
-            printf("%c ", tab1[i][j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
+    //Impression du premier et dernier range lu
+    printf("Premier range : %ld-%ld\n", tab1[0][0], tab1[0][1]);
+    printf("Dernier range : %ld-%ld\n",  tab1[NBR_RANGES-1][0], tab1[NBR_RANGES-1][1]);
+
+    //Impression du premier et dernier ingredient lu
+    printf("Premier ingredient : %ld\n", tab2[0][0]);
+    printf("Dernier ingredient : %ld\n",  tab2[NBR_INGR-1][0]);
+
 
     //--------------Part 1-----------------
-    for(i=1 ; i<NBR_LINES+1 ; i++)
+    //Peut être pas utile mais on ne sait jamais
+    //On trie les ranges pour que le plus petit nombre soit à gauche et le plus grand à droite
+    for(i=0 ; i<NBR_RANGES ; i++)
     {
-        for(j=1 ; j<NBR_COL+1 ; j++)
+        if(tab1[i][0] > tab1[i][1])
         {
-            nbrRolls = 0;
+            int temp = tab1[i][0];
+            tab1[i][0] = tab1[i][1];
+            tab2[i][1] = temp;
+            printf("Change\n");
+        }
+    }
 
-            if(tab1[i][j] == '@')
+    for(i=0 ; i<NBR_INGR ; i++)
+    {
+        for(j=0 ; j<NBR_RANGES ; j++)
+        {
+            if((tab1[j][0] <= tab2[i][0]) && (tab2[i][0] <= tab1[j][1]))
             {
-                if(tab1[i][j+1] == '@') //à droite
-                    nbrRolls++;
-                if(tab1[i+1][j+1] == '@') //en bas à droite
-                    nbrRolls++;
-                if(tab1[i+1][j] == '@') //en bas
-                    nbrRolls++;
-                if(tab1[i+1][j-1] == '@') //en bas à gauche
-                    nbrRolls++;
-                if(tab1[i][j-1] == '@') //à gauche
-                    nbrRolls++;
-                if(tab1[i-1][j-1] == '@') //en haut à gauche
-                    nbrRolls++;
-                if(tab1[i-1][j] == '@') //en haut
-                    nbrRolls++;
-                if(tab1[i-1][j+1] == '@') //en haut à droite
-                    nbrRolls++;
-
-                if(nbrRolls < 4)
-                {
-                    tab2[i][j] = 'x';
-                    nbrRolls = 0;
-                }
-                else
-                {
-                    tab2[i][j] = '.';
-                }
-            }
-            else
-            {
-                tab2[i][j] = ';';
+                tab2[i][1] += 1;
             }
         }
     }
 
-    //Impression du puzzle complet
-    for(i=0 ; i<NBR_LINES+2 ; i++)
+    for(i=0 ; i<NBR_INGR ; i++)
     {
-        for(j=0 ; j<NBR_COL+2 ; j++)
-        {
-            printf("%c ", tab2[i][j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
-
-
-    for(i=1 ; i<NBR_LINES+1 ; i++)
-    {
-        for(j=1 ; j<NBR_COL+1 ; j++)
-        {
-            if(tab2[i][j] == 'x')
-                somme1 += 1;
-        }
+        if(tab2[i][1] >= 1)
+            somme1 += 1;
     }
 
     printf("somme1 = %ld\n\n\n", somme1);
 
 
     //--------------Part 2-----------------
+    nbrRange = NBR_RANGES;
+
     do
     {
+        tab3[0][0] = tab1[0][0];
+        tab3[0][1] = tab1[0][1];
+        newRange = 1;
         encore = 0;
-        for(i=1 ; i<NBR_LINES+1 ; i++)
+        int dejaTraite = 0;
+
+        for(i=1 ; i<nbrRange ; i++)
         {
-            for(j=1 ; j<NBR_COL+1 ; j++)
+            dejaTraite = 0;
+
+            for(j=0 ; j<newRange ; j++)
             {
-                nbrRolls = 0;
-
-                if(tab1[i][j] == '@')
+                //Si les intervalles sont égaux
+                if((tab3[j][0] == tab1[i][0]) && (tab3[j][1] == tab1[i][1]))
                 {
-                    if(tab1[i][j+1] == '@') //à droite
-                        nbrRolls++;
-                    if(tab1[i+1][j+1] == '@') //en bas à droite
-                        nbrRolls++;
-                    if(tab1[i+1][j] == '@') //en bas
-                        nbrRolls++;
-                    if(tab1[i+1][j-1] == '@') //en bas à gauche
-                        nbrRolls++;
-                    if(tab1[i][j-1] == '@') //à gauche
-                        nbrRolls++;
-                    if(tab1[i-1][j-1] == '@') //en haut à gauche
-                        nbrRolls++;
-                    if(tab1[i-1][j] == '@') //en haut
-                        nbrRolls++;
-                    if(tab1[i-1][j+1] == '@') //en haut à droite
-                        nbrRolls++;
+                    dejaTraite = 1;
+                    encore = 1;
+                    break;
+                }
 
-                    if(nbrRolls < 4)
-                    {
-                        tab1[i][j] = '.';
-                        tab3[i][j] = 'x';
-                        nbrRolls = 0;
-                        encore = 1;
-                    }
+                //Si le nouvel intervalle est inclu dans un existant
+                if((tab3[j][0] < tab1[i][0]) &&     //Butée gauche supérieure
+                    (tab3[j][1] > tab1[i][1]))      //Butée doite inférieure
+                {
+                    dejaTraite = 1;
+                    break;
+                }
+
+                //Si le nouvel intervalle inclu dans un déjà existant
+                if((tab3[j][0] > tab1[i][0]) &&     //Butée gauche inférieure
+                    (tab3[j][1] < tab1[i][1]))      //Butée doite supérieure
+                {
+                    tab3[j][0] = tab1[i][0];    //On change la butée gauche
+                    tab3[j][1] = tab1[i][1];    //On change la butée droite
+                    dejaTraite = 1;
+                    encore = 1;
+                    break;
+                }
+
+                //Si les intervalles se recoupent, on agrandit l'intervalle
+                //Si le range depasse par la droite
+                if((tab3[j][0] <= tab1[i][0]) && (tab3[j][1] >= tab1[i][0]) &&    //Butée gauche contenu dans l'intervalle
+                   (tab3[j][1] < tab1[i][1]))                                   //Butée droite à l'extérieur de l'intervalle
+                {
+                    tab3[j][1] = tab1[i][1];    //On change la butée droite
+                    dejaTraite = 1;
+                    encore = 1;
+                    break;
+                }
+
+                //Si les intervalles se recoupent, on agrandit l'intervalle
+                //Si le range depasse par la gauche
+                if((tab3[j][0] <= tab1[i][1]) && (tab3[j][1] >= tab1[i][1]) &&    //Butée droite contenu dans l'intervalle
+                   (tab3[j][0] > tab1[i][0]))                                   //Butée gauche à l'extérieur de l'intervalle
+                {
+                    tab3[j][0] = tab1[i][0];    //On change la butée gauche
+                    dejaTraite = 1;
+                    encore = 1;
+                    break;
+                }
+            }
+
+            if(dejaTraite == 0)
+            {
+                //Si les intervalles ne se recoupent pas, on crée un nouvel l'intervalle dans la tableau final
+                if(!((tab3[j][0] < tab1[i][1]) && (tab3[j][1] > tab1[i][1])) && //Butée gauche non inclue dans l'intervalle
+                   !((tab3[j][0] < tab1[i][1]) && (tab3[j][1] > tab1[i][1])))   //Butée droite non inclue dans l'intervalle
+                {
+                    tab3[newRange][0] = tab1[i][0];
+                    tab3[newRange][1] = tab1[i][1];
+                    newRange += 1;
                 }
             }
         }
+
+        memset(tab1, 0, sizeof(tab1));
+        memcpy(tab1, tab3, sizeof(tab1));
+        memset(tab3, 0, sizeof(tab3));
+        nbrRange = newRange;
     }
     while(encore == 1);
 
-    for(i=1 ; i<NBR_LINES+1 ; i++)
+    for(i=0 ; i<nbrRange ; i++)
     {
-        for(j=1 ; j<NBR_COL+1 ; j++)
-        {
-            if(tab3[i][j] == 'x')
-                somme2 += 1;
-        }
+        somme2 += tab1[i][1] - tab1[i][0] + 1;
     }
 
     printf("somme2 = %ld\n", somme2);
-
+    //11630551434436 too low
+    //355762379275859 too high
 
     fclose(fic);
     fic = NULL;
