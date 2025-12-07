@@ -4,15 +4,22 @@
 #include <ctype.h>
 #include <stdint.h>
 
-#define NBR_RANGES   4
-#define NBR_INGR     6
-//#define NBR_RANGES   187
-//#define NBR_INGR     1000
+//#define NBR_RANGES   4
+//#define NBR_INGR     6
+#define NBR_RANGES   187
+#define NBR_INGR     1000
+
+
+// Fonction pour comparer deux intervalles (pour qsort)
+int comparerIntervalles(const void *a, const void *b)
+{
+    const long long *ia = *(const long long **)a;
+    const long long *ib = *(const long long **)b;
+    return (ia[0] > ib[0]) ? 1 : -1;
+}
 
 int main(int argc, char *argv[])
 {
-    //char buf1[NBR_COL+2];
-    //char buf2[NBR_COL+2];
     int64_t i = 0;
     int64_t j = 0;
     int64_t somme1 = 0;
@@ -20,7 +27,6 @@ int main(int argc, char *argv[])
     int64_t tab1[NBR_RANGES][2];
     int64_t tab2[NBR_INGR][2];
     int64_t tab3[NBR_RANGES][2];
-    int64_t tab4[NBR_RANGES];
     int newRange = 0;
     int nbrRange = 0;
     int encore = 0;
@@ -71,19 +77,6 @@ int main(int argc, char *argv[])
 
 
     //--------------Part 1-----------------
-    //Peut être pas utile mais on ne sait jamais
-    //On trie les ranges pour que le plus petit nombre soit à gauche et le plus grand à droite
-    for(i=0 ; i<NBR_RANGES ; i++)
-    {
-        if(tab1[i][0] > tab1[i][1])
-        {
-            int temp = tab1[i][0];
-            tab1[i][0] = tab1[i][1];
-            tab2[i][1] = temp;
-            printf("Change\n");
-        }
-    }
-
     for(i=0 ; i<NBR_INGR ; i++)
     {
         for(j=0 ; j<NBR_RANGES ; j++)
@@ -105,17 +98,37 @@ int main(int argc, char *argv[])
 
 
     //--------------Part 2-----------------
+    //On va trier les intervales du plus petits au plus grand
+    uint64_t temp = 0;
+
+    for(i=0 ; i<NBR_RANGES-1 ; i++)
+    {
+        for(j=0 ; j<NBR_RANGES-1 ; j++)
+        {
+            if(tab1[j][0] > tab1[j+1][0])  //Si la valeur de dessus est supérieure, on permutte les valeurs
+            {
+                temp = tab1[j][0];
+                tab1[j][0] = tab1[j+1][0];
+                tab1[j+1][0] = temp;
+
+                temp = tab1[j][1];
+                tab1[j][1] = tab1[j+1][1];
+                tab1[j+1][1] = temp;
+            }
+        }
+    }
+
     nbrRange = NBR_RANGES;
 
     do
     {
         tab3[0][0] = tab1[0][0];
         tab3[0][1] = tab1[0][1];
-        newRange = 1;
+        newRange = 0;
         encore = 0;
         int dejaTraite = 0;
 
-        for(i=1 ; i<nbrRange ; i++)
+        for(i=0 ; i<nbrRange ; i++)
         {
             dejaTraite = 0;
 
@@ -125,21 +138,20 @@ int main(int argc, char *argv[])
                 if((tab3[j][0] == tab1[i][0]) && (tab3[j][1] == tab1[i][1]))
                 {
                     dejaTraite = 1;
-                    encore = 1;
                     break;
                 }
 
-                //Si le nouvel intervalle est inclu dans un existant
-                if((tab3[j][0] < tab1[i][0]) &&     //Butée gauche supérieure
-                    (tab3[j][1] > tab1[i][1]))      //Butée doite inférieure
+                //Si le nouvel intervalle est inclu dans un existant dans le nouveau tableau
+                if((tab3[j][0] <= tab1[i][0]) &&     //Butée gauche supérieure
+                    (tab3[j][1] >= tab1[i][1]))      //Butée doite inférieure
                 {
                     dejaTraite = 1;
                     break;
                 }
 
-                //Si le nouvel intervalle inclu dans un déjà existant
-                if((tab3[j][0] > tab1[i][0]) &&     //Butée gauche inférieure
-                    (tab3[j][1] < tab1[i][1]))      //Butée doite supérieure
+                //Si le nouvel intervalle inclu un intervalle déjà existant
+                if((tab3[j][0] >= tab1[i][0]) &&     //Butée gauche inférieure
+                    (tab3[j][1] <= tab1[i][1]))      //Butée doite supérieure
                 {
                     tab3[j][0] = tab1[i][0];    //On change la butée gauche
                     tab3[j][1] = tab1[i][1];    //On change la butée droite
@@ -150,10 +162,11 @@ int main(int argc, char *argv[])
 
                 //Si les intervalles se recoupent, on agrandit l'intervalle
                 //Si le range depasse par la droite
-                if((tab3[j][0] <= tab1[i][0]) && (tab3[j][1] >= tab1[i][0]) &&    //Butée gauche contenu dans l'intervalle
-                   (tab3[j][1] < tab1[i][1]))                                   //Butée droite à l'extérieur de l'intervalle
+                if((tab3[j][0] <= tab1[i][0]) && (tab3[j][1] >= tab1[i][0]))// &&    //Butée gauche contenu dans l'intervalle
+                   //(tab3[j][1] < tab1[i][1]))                                   //Butée droite à l'extérieur de l'intervalle
                 {
-                    tab3[j][1] = tab1[i][1];    //On change la butée droite
+                    if(tab1[i][0] != tab1[i][1])    //Elimine les cas ou les 2 butées sont égales
+                        tab3[j][1] = tab1[i][1];    //On change la butée droite
                     dejaTraite = 1;
                     encore = 1;
                     break;
@@ -161,10 +174,11 @@ int main(int argc, char *argv[])
 
                 //Si les intervalles se recoupent, on agrandit l'intervalle
                 //Si le range depasse par la gauche
-                if((tab3[j][0] <= tab1[i][1]) && (tab3[j][1] >= tab1[i][1]) &&    //Butée droite contenu dans l'intervalle
-                   (tab3[j][0] > tab1[i][0]))                                   //Butée gauche à l'extérieur de l'intervalle
+                if((tab3[j][0] <= tab1[i][1]) && (tab3[j][1] >= tab1[i][1]))// &&    //Butée droite contenu dans l'intervalle
+                   //(tab3[j][0] > tab1[i][0]))                                   //Butée gauche à l'extérieur de l'intervalle
                 {
-                    tab3[j][0] = tab1[i][0];    //On change la butée gauche
+                    if(tab1[i][0] != tab1[i][1])    //Elimine les cas ou les 2 butées sont égales
+                        tab3[j][0] = tab1[i][0];    //On change la butée gauche
                     dejaTraite = 1;
                     encore = 1;
                     break;
@@ -173,14 +187,10 @@ int main(int argc, char *argv[])
 
             if(dejaTraite == 0)
             {
-                //Si les intervalles ne se recoupent pas, on crée un nouvel l'intervalle dans la tableau final
-                if(!((tab3[j][0] < tab1[i][1]) && (tab3[j][1] > tab1[i][1])) && //Butée gauche non inclue dans l'intervalle
-                   !((tab3[j][0] < tab1[i][1]) && (tab3[j][1] > tab1[i][1])))   //Butée droite non inclue dans l'intervalle
-                {
+                //Si les intervalles ne se recoupent pas, on recopie l'intervalle dans la tableau final
                     tab3[newRange][0] = tab1[i][0];
                     tab3[newRange][1] = tab1[i][1];
                     newRange += 1;
-                }
             }
         }
 
@@ -191,14 +201,22 @@ int main(int argc, char *argv[])
     }
     while(encore == 1);
 
+
+
+    // Affichage des intervalles fusionnés
+    /*for(i = 0; i < nbrRange; i++)
+    {
+        printf("%ld-%ld\n", tab1[i][0], tab1[i][1]);
+    }*/
+
+    printf("Nombre d'intervalles apres fusion : %d\n", nbrRange);
+
     for(i=0 ; i<nbrRange ; i++)
     {
         somme2 += tab1[i][1] - tab1[i][0] + 1;
     }
 
     printf("somme2 = %ld\n", somme2);
-    //11630551434436 too low
-    //355762379275859 too high
 
     fclose(fic);
     fic = NULL;
