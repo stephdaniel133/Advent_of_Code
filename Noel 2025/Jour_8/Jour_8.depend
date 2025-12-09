@@ -44,3 +44,12 @@
 	<ctype.h>
 	<stdint.h>
 
+1765231772 source:/home/stephane/Arduino/Advent_of_Code/Noel 2025/Jour_8/main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	<stdint.h>
+	<math.h>
+	<stdbool.h>
+
